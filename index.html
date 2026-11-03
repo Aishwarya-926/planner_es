@@ -1,0 +1,3236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Apex Study HUD - Sem 5 Command</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #131a29;
+      --card-border: #1e293b;
+      --accent: #00e5ff;
+      --accent-glow: rgba(0, 229, 255, 0.2);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 90px;
+      overflow-x: hidden;
+    }
+
+    /* Top App Bar */
+    .app-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .app-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-live {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .btn-action.active {
+      background: var(--accent);
+      color: #0b0f19;
+      border-color: var(--accent);
+    }
+
+    /* Container */
+    .container {
+      padding: 14px 16px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* HERO HUD: Current Session */
+    .hud-card {
+      background: linear-gradient(135deg, #131a29 0%, #17223b 100%);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 20px var(--accent-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hud-tag-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .hud-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 1.5s infinite;
+    }
+
+    .hud-time-left {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hud-subject {
+      font-size: 1.4rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .hud-topic {
+      font-size: 1rem;
+      color: #cbd5e1;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .hud-files-box {
+      background: rgba(11, 15, 25, 0.75);
+      border: 1px dashed #334155;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .hud-files-header {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .file-chip {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: #38bdf8;
+      display: block;
+      margin-bottom: 6px;
+      word-break: break-all;
+      font-family: monospace;
+    }
+
+    .hud-desc {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .next-preview {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 10px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Date Pills Horizontal Scroll */
+    .date-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .date-scroll::-webkit-scrollbar { display: none; }
+
+    .date-pill {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .date-pill.active {
+      background: #1e293b;
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* Timeline Cards */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slot-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .slot-card.done {
+      opacity: 0.45;
+      filter: grayscale(0.5);
+    }
+
+    .slot-card.now-slot {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .slot-time {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 55px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-right: 1px solid var(--card-border);
+      padding-right: 10px;
+      justify-content: center;
+    }
+
+    .slot-body {
+      flex: 1;
+    }
+
+    .slot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .subject-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-MechLab { background: #3b82f6; color: #fff; }
+    .badge-ManTech { background: #10b981; color: #fff; }
+    .badge-FOTE { background: #f59e0b; color: #000; }
+    .badge-HeatTransfer { background: #ef4444; color: #fff; }
+    .badge-ControlSystems { background: #8b5cf6; color: #fff; }
+    .badge-MachineDesign { background: #ec4899; color: #fff; }
+    .badge-Exam { background: #dc2626; color: #fff; font-weight: 900; animation: pulse 1.5s infinite; }
+    .badge-Submission { background: #eab308; color: #000; font-weight: 900; }
+    .badge-Class { background: #475569; color: #e2e8f0; }
+    .badge-Routine { background: #334155; color: #94a3b8; }
+
+    .slot-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .slot-files {
+      font-size: 0.75rem;
+      color: #38bdf8;
+      font-family: monospace;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    .slot-check {
+      display: flex;
+      align-items: center;
+      padding-left: 6px;
+    }
+
+    .custom-checkbox {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Modal for Dynamic File Scanner */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    /* Bottom Quick Nav Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(11, 15, 25, 0.95);
+      border-top: 1px solid var(--card-border);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-around;
+      z-index: 40;
+    }
+
+    .bar-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .bar-btn.active {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="app-bar">
+    <div class="app-title">
+      <span>⚡ APEX STUDY HUD</span>
+      <span class="badge-live">LIVE</span>
+    </div>
+    <div class="top-actions">
+      <button id="btnNotif" class="btn-action" onclick="toggleNotifications()">
+        <span id="notifIcon">🔔</span> Alerts
+      </button>
+      <button class="btn-action" onclick="window.location.href='/calendar.ics'">
+        📅 Sync Cal
+      </button>
+      <button class="btn-action" onclick="openScanner()">
+        📁 Scan Files
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Active HUD Card -->
+    <section id="hudCard" class="hud-card">
+      <div class="hud-tag-row">
+        <span class="hud-label">
+          <span class="pulse-dot"></span> <span id="hudStatus">ACTIVE STUDY BLOCK</span>
+        </span>
+        <span id="hudCountdown" class="hud-time-left">00:00:00 Remaining</span>
+      </div>
+      <h2 id="hudSubject" class="hud-subject">Loading schedule...</h2>
+      <p id="hudTopic" class="hud-topic">Analyzing timetable and folder files...</p>
+      
+      <div id="hudFilesBox" class="hud-files-box">
+        <div class="hud-files-header">📂 Required Course Material (D:\Sem 5)</div>
+        <div id="hudFilesList"></div>
+      </div>
+
+      <p id="hudDesc" class="hud-desc"></p>
+
+      <div class="next-preview">
+        <span>NEXT SESSION:</span>
+        <strong id="hudNext">Loading...</strong>
+      </div>
+    </section>
+
+    <!-- Date Pills Selector -->
+    <div class="date-scroll" id="datePills"></div>
+
+    <!-- Timeline of Blocks for Selected Date -->
+    <div class="timeline" id="timelineList"></div>
+  </main>
+
+  <!-- Dynamic File Scanner Modal -->
+  <div id="scannerModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">D:\Sem 5 Live File Scanner</h3>
+        <button class="modal-close" onclick="closeScanner()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:12px;">
+          As classes finish this week, newly downloaded slides, problem sets, and past papers appear here automatically:
+        </p>
+        <div id="scannerFileList">Loading scanned files...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Chime Generator using Web Audio API -->
+  <script>
+    let audioCtx = null;
+    function playChime() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15); // A5
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      } catch (e) {
+        console.error("Audio error", e);
+      }
+    }
+  </script>
+
+  <!-- Main HUD Application Logic -->
+  <script>
+    let fullSchedule = [
+  {
+    "id": "blk_001",
+    "date": "2026-11-03",
+    "start": "19:15",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Mech Lab",
+    "topic": "Mechanisms Dynamics, Friction, Wear & CMM Metrology",
+    "files": [
+      "Mech Lab\\D1 Study of Mechanisms.pdf",
+      "Mech Lab\\D2 Friction and wear.pdf",
+      "Mech Lab\\D3 Cam and follower.pdf",
+      "Mech Lab\\M1 CMM Metrology.pdf"
+    ],
+    "description": "Master degrees of freedom, cam jump speed derivations, pin-on-disk wear coefficient formulas, and CMM touch probe / GD&T principles for Thursday's exam.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_002",
+    "date": "2026-11-03",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner & Mental Decompression",
+    "files": [],
+    "description": "Hydrate, eat clean, 10 min walk. Zero screen time.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_003",
+    "date": "2026-11-03",
+    "start": "21:45",
+    "end": "23:45",
+    "type": "STUDY",
+    "subject": "Mech Lab",
+    "topic": "Machining Metrology, Cutting Dynamometer & Gear Measurement",
+    "files": [
+      "Mech Lab\\M2 Experiment Manual.pdf",
+      "Mech Lab\\M3 Experiment Manual.pdf"
+    ],
+    "description": "Calculate Ra/Rz surface roughness, lathe tool dynamometer cutting force equations, and gear runout/pitch measurement.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_004",
+    "date": "2026-11-03",
+    "start": "23:45",
+    "end": "00:00",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Hydration & Stretch Break",
+    "files": [],
+    "description": "Quick physical reset.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_005",
+    "date": "2026-11-04",
+    "start": "00:00",
+    "end": "01:15",
+    "type": "STUDY",
+    "subject": "Mech Lab",
+    "topic": "IC Engine & Pelton Turbine Performance Characteristics",
+    "files": [
+      "Mech Lab\\Performance And Emission Characteristics Of A Spark Ignition Engine.pdf",
+      "Mech Lab\\Performance Characteristics Of Pelton turbine.pdf"
+    ],
+    "description": "Brake thermal efficiency, SFC curves, Pelton turbine velocity triangles, unit power/speed/discharge definitions.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_006",
+    "date": "2026-11-04",
+    "start": "01:15",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Deep Sleep & Memory Consolidation",
+    "files": [],
+    "description": "Crucial 5.75 hours uninterrupted rest to cement memory.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_007",
+    "date": "2026-11-04",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "High-protein breakfast, hydrate.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_008",
+    "date": "2026-11-04",
+    "start": "08:00",
+    "end": "08:50",
+    "type": "CLASS",
+    "subject": "Heat Transfer",
+    "topic": "Slot C Class (Heat Transfer)",
+    "files": [
+      "Heat Transfer\\Notes\\Lec 38.pdf"
+    ],
+    "description": "Attend lecture. Note any exam tips or omitted topics.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_009",
+    "date": "2026-11-04",
+    "start": "09:00",
+    "end": "09:50",
+    "type": "CLASS",
+    "subject": "Control Systems",
+    "topic": "Slot D Class (Control Systems)",
+    "files": [
+      "Control Systems\\Lecture Notes\\Controller Design_ StateSpace.pdf"
+    ],
+    "description": "Attend lecture. Clarify project submission parameters.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_010",
+    "date": "2026-11-04",
+    "start": "10:00",
+    "end": "10:50",
+    "type": "STUDY",
+    "subject": "Mech Lab",
+    "topic": "VCR Refrigeration & Heat Exchanger Experiments",
+    "files": [
+      "Mech Lab\\Performance Test on Vapour Compression Refrigeration System.pdf",
+      "Mech Lab\\Performance of co-flow and counter-flow heat exchangers.pdf"
+    ],
+    "description": "Free slot study: COP on p-h diagrams, co-flow vs counter-flow LMTD, overall heat transfer coefficient U.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_011",
+    "date": "2026-11-04",
+    "start": "11:00",
+    "end": "11:50",
+    "type": "CLASS",
+    "subject": "Machine Design",
+    "topic": "Slot F Class (Machine Design)",
+    "files": [
+      "Machine Design\\Notes\\DesignOfSpurGears.pdf"
+    ],
+    "description": "Attend lecture. Gear design clarifications.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_012",
+    "date": "2026-11-04",
+    "start": "11:50",
+    "end": "13:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch & Refresh",
+    "files": [],
+    "description": "Lunch recess.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_013",
+    "date": "2026-11-04",
+    "start": "13:00",
+    "end": "13:50",
+    "type": "CLASS",
+    "subject": "FOTE",
+    "topic": "Slot B Class (FOTE)",
+    "files": [
+      "FOTE\\Turbomachinery_Module 3_Performance.pdf"
+    ],
+    "description": "Attend lecture.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_014",
+    "date": "2026-11-04",
+    "start": "14:00",
+    "end": "16:00",
+    "type": "STUDY",
+    "subject": "Mech Lab",
+    "topic": "Mech Lab Master Summary & Formula Sheet Finalization",
+    "files": [
+      "Mech Lab\\D1 Study of Mechanisms.pdf",
+      "Mech Lab\\D2 Friction and wear.pdf",
+      "Mech Lab\\D3 Cam and follower.pdf",
+      "Mech Lab\\M1 CMM Metrology.pdf",
+      "Mech Lab\\M2 Experiment Manual.pdf",
+      "Mech Lab\\M3 Experiment Manual.pdf",
+      "Mech Lab\\Performance And Emission Characteristics Of A Spark Ignition Engine.pdf",
+      "Mech Lab\\Performance Characteristics Of Pelton turbine.pdf",
+      "Mech Lab\\Performance Test on Vapour Compression Refrigeration System.pdf",
+      "Mech Lab\\Performance of co-flow and counter-flow heat exchangers.pdf"
+    ],
+    "description": "Synthesize 1 compact formula sheet for all 10 experiments. Rehearse viva questions, schematic diagrams, and error sources. Mech Lab prep 100% complete!",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_015",
+    "date": "2026-11-04",
+    "start": "16:00",
+    "end": "16:15",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Tea / Walk",
+    "files": [],
+    "description": "Quick energy boost.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_016",
+    "date": "2026-11-04",
+    "start": "16:15",
+    "end": "18:45",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Project: Controller Design & Virtual Experiment Identification",
+    "files": [
+      "Control Systems\\Project Statement.pdf",
+      "Control Systems\\Lecture Notes\\lqrt_two_cart_test.m",
+      "Control Systems\\Lecture Notes\\Controller Design_ StateSpace.pdf",
+      "Control Systems\\Lecture Notes\\Controller Design_ RL_Freq.pdf"
+    ],
+    "description": "Run simulations on sealed unit unit_teamNN, estimate plant parameters, tune LQR gain K / state observer to satisfy client requirements with sensor noise & saturation.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_017",
+    "date": "2026-11-04",
+    "start": "18:45",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Project: Controller Verification & Client Report Writing",
+    "files": [
+      "Control Systems\\Project Statement.pdf"
+    ],
+    "description": "Verify step response, steady-state error, control effort under noise. Write clean report sections.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_018",
+    "date": "2026-11-04",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_019",
+    "date": "2026-11-04",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Project: Francis Turbine Guide Bearing Report Finalization",
+    "files": [
+      "Machine Design\\Machine Deisgn Project\\Calculations.xlsx",
+      "Machine Design\\formula_reference.md",
+      "Machine Design\\Machine Deisgn Project\\TGB_Dimensioned_Engineering_Drawing_Rev4.png",
+      "Machine Design\\Machine Deisgn Project\\Turbine_Guide_Bearing_TGB_Hatched-Model.pdf"
+    ],
+    "description": "Verify all shaft stresses, thrust bearing axial load Fa = W + Th, hydrodynamic oil film thickness, compile final project document for Friday submission.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_020",
+    "date": "2026-11-05",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Full rest before Lab exam.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_021",
+    "date": "2026-11-05",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_022",
+    "date": "2026-11-05",
+    "start": "08:00",
+    "end": "08:50",
+    "type": "STUDY",
+    "subject": "Mech Lab",
+    "topic": "Mech Lab Final Formula & Viva Mental Rehearsal",
+    "files": [
+      "Mech Lab\\M1 CMM Metrology.pdf"
+    ],
+    "description": "Review cheat sheet: formulas, definitions, schematic diagrams.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_023",
+    "date": "2026-11-05",
+    "start": "09:00",
+    "end": "09:50",
+    "type": "CLASS",
+    "subject": "Machine Design",
+    "topic": "Slot F Class (Machine Design)",
+    "files": [
+      "Machine Design\\Notes\\Gears.pdf"
+    ],
+    "description": "Attend lecture.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_024",
+    "date": "2026-11-05",
+    "start": "10:00",
+    "end": "10:50",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "MD Project Report Final Polish & Sanity Check",
+    "files": [
+      "Machine Design\\Machine Deisgn Project\\Calculations.xlsx"
+    ],
+    "description": "Sanity check on calculations, figures, tables.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_025",
+    "date": "2026-11-05",
+    "start": "11:00",
+    "end": "11:50",
+    "type": "CLASS",
+    "subject": "Man Tech",
+    "topic": "Slot A Class (Man Tech)",
+    "files": [
+      "Man Tech\\Module 4.2.pdf"
+    ],
+    "description": "Attend lecture. Note any exam announcements.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_026",
+    "date": "2026-11-05",
+    "start": "11:50",
+    "end": "13:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch & Pre-Exam Focus",
+    "files": [],
+    "description": "Light meal, stay sharp.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_027",
+    "date": "2026-11-05",
+    "start": "13:00",
+    "end": "13:50",
+    "type": "CLASS",
+    "subject": "Control Systems",
+    "topic": "Slot D Class (Control Systems)",
+    "files": [
+      "Control Systems\\Lecture Notes\\Controller Design_ StateSpace.pdf"
+    ],
+    "description": "Attend lecture.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_028",
+    "date": "2026-11-05",
+    "start": "14:00",
+    "end": "17:00",
+    "type": "EXAM",
+    "subject": "Mech Lab",
+    "topic": "MECH LAB END SEM EXAM",
+    "files": [],
+    "description": "Execute lab exam with precision. Verify readings, show clean step-by-step calculations and error analysis.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_029",
+    "date": "2026-11-05",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Decompression & Exercise",
+    "files": [],
+    "description": "Walk, breathe, clear mind.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_030",
+    "date": "2026-11-05",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "CS Project Finalization & Code Packaging",
+    "files": [
+      "Control Systems\\Project Statement.pdf",
+      "Control Systems\\Lecture Notes\\lqrt_two_cart_test.m"
+    ],
+    "description": "Final packaging of controller MATLAB script, test scripts, and complete project report for tomorrow's submission.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_031",
+    "date": "2026-11-05",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_032",
+    "date": "2026-11-05",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Viva & Acceptance Test Defense Preparation",
+    "files": [
+      "Control Systems\\Lecture Notes\\Controller Design_ StateSpace.pdf",
+      "Control Systems\\Lecture Notes\\Controller Design_ RL_Freq.pdf",
+      "Control Systems\\Lecture Notes\\Stability.pdf"
+    ],
+    "description": "Prepare rigorous defense for Saturday's acceptance test: Explain choice of Q and R matrices in LQR, observer pole locations, gain/phase margin tradeoffs under plant uncertainty.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_033",
+    "date": "2026-11-06",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Sleep 6.5 hours.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_034",
+    "date": "2026-11-06",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_035",
+    "date": "2026-11-06",
+    "start": "08:00",
+    "end": "08:50",
+    "type": "CLASS",
+    "subject": "Machine Design",
+    "topic": "Slot F Class (Machine Design - LAST CLASS)",
+    "files": [],
+    "description": "Final class. Clarify endsem syllabus distribution.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_036",
+    "date": "2026-11-06",
+    "start": "09:00",
+    "end": "09:50",
+    "type": "SUBMISSION",
+    "subject": "Machine Design",
+    "topic": "SUBMIT: Machine Design Project Report",
+    "files": [
+      "Machine Design\\Machine Deisgn Project\\Calculations.xlsx"
+    ],
+    "description": "Export finalized PDF, verify submission portal checklist, and submit officially.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_037",
+    "date": "2026-11-06",
+    "start": "10:00",
+    "end": "10:50",
+    "type": "CLASS",
+    "subject": "Man Tech",
+    "topic": "Slot A Class (Man Tech - LAST CLASS)",
+    "files": [
+      "Man Tech\\Module 4.2.pdf"
+    ],
+    "description": "Final class. Check for any extra modules / notes distributed.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_038",
+    "date": "2026-11-06",
+    "start": "11:00",
+    "end": "11:50",
+    "type": "CLASS",
+    "subject": "FOTE",
+    "topic": "Slot B Class (FOTE - LAST CLASS)",
+    "files": [],
+    "description": "Final class. Collect all remaining slides.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_039",
+    "date": "2026-11-06",
+    "start": "11:50",
+    "end": "13:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch",
+    "files": [],
+    "description": "Lunch recess.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_040",
+    "date": "2026-11-06",
+    "start": "13:00",
+    "end": "13:50",
+    "type": "CLASS",
+    "subject": "Heat Transfer",
+    "topic": "Slot C Class (Heat Transfer - LAST CLASS)",
+    "files": [],
+    "description": "Final class of the semester! Note any tips for endsem.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_041",
+    "date": "2026-11-06",
+    "start": "14:00",
+    "end": "15:00",
+    "type": "SUBMISSION",
+    "subject": "Control Systems",
+    "topic": "SUBMIT: Control Systems Controller & Report",
+    "files": [
+      "Control Systems\\Project Statement.pdf"
+    ],
+    "description": "Upload controller code package and final report. Both major semester submissions complete!",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_042",
+    "date": "2026-11-06",
+    "start": "15:00",
+    "end": "15:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Milestone Reset: Classes Officially Over",
+    "files": [],
+    "description": "Classes complete. Total autonomy begins now.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_043",
+    "date": "2026-11-06",
+    "start": "15:30",
+    "end": "18:30",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Acceptance Test Live Simulation & Dry Run",
+    "files": [
+      "Control Systems\\Project Statement.pdf",
+      "Control Systems\\Lecture Notes\\lqrt_two_cart_test.m"
+    ],
+    "description": "Run repeated Monte-Carlo simulations with randomized noise and disturbance. Practice live demo and answers to viva probes.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_044",
+    "date": "2026-11-06",
+    "start": "18:30",
+    "end": "19:00",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Evening Walk & Tea",
+    "files": [],
+    "description": "Recharge.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_045",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Machine Tool Principles & Speed Gear Box (SGB) Ray Diagrams",
+    "files": [
+      "Man Tech\\Module 0.pdf",
+      "Man Tech\\Module 1.1.pdf",
+      "Man Tech\\Module 2.1.pdf",
+      "Man Tech\\ME3305 T1.pdf"
+    ],
+    "description": "LAUNCH PHASE 2 (11-Credit Man Tech Assault): Kinematic structures, ray diagrams, structural formulas, phi ratio selection.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_046",
+    "date": "2026-11-06",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_047",
+    "date": "2026-11-06",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "SGB Numerical Problems & Differential Mechanisms",
+    "files": [
+      "Man Tech\\Module 2.1.pdf",
+      "Man Tech\\Module 2.2.pdf",
+      "Man Tech\\ME3305 T1.pdf"
+    ],
+    "description": "Solve Tutorial 1 completely. Study differential mechanisms, feed drive gearboxes, and Norton gearboxes.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_048",
+    "date": "2026-11-07",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Sleep 6.5 hours before Acceptance Day Test.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_049",
+    "date": "2026-11-07",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_050",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Final Script Verification & Viva Warmup",
+    "files": [
+      "Control Systems\\Project Statement.pdf"
+    ],
+    "description": "Final check of MATLAB environment, scripts, and arguments.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_051",
+    "date": "2026-11-07",
+    "start": "09:30",
+    "end": "13:00",
+    "type": "EXAM",
+    "subject": "Control Systems",
+    "topic": "CONTROL SYSTEMS ACCEPTANCE DAY TEST AND VIVA",
+    "files": [],
+    "description": "Pass live acceptance test and defend controller architecture in front of client. Milestone cleared!",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_052",
+    "date": "2026-11-07",
+    "start": "13:00",
+    "end": "14:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch & Post-Viva Refresh",
+    "files": [],
+    "description": "Healthy lunch and reset.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_053",
+    "date": "2026-11-07",
+    "start": "14:00",
+    "end": "17:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "NC & CNC Fundamentals + G-Code / M-Code Programming",
+    "files": [
+      "Man Tech\\Module 3.1.pdf",
+      "Man Tech\\Module 3.2.pdf",
+      "Man Tech\\Haas VF-2 Programming Workbook.pdf"
+    ],
+    "description": "DDA interpolators, MCU architecture, absolute (G90) vs incremental (G91), linear (G01) / circular (G02/G03), tool length (G43) and cutter radius compensation (G41/G42).",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_054",
+    "date": "2026-11-07",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Break / Tea",
+    "files": [],
+    "description": "30-min recharge.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_055",
+    "date": "2026-11-07",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Canned Cycles: Milling & Turning Programming",
+    "files": [
+      "Man Tech\\Module 3.3.pdf",
+      "Man Tech\\Module 3.4.pdf",
+      "Man Tech\\ME3305 T2.pdf"
+    ],
+    "description": "Circular pocket milling cycles, G81-G89 drilling canned cycles, turning canned cycles (G71, G70, G76). Complete Tutorial 2 questions.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_056",
+    "date": "2026-11-07",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_057",
+    "date": "2026-11-07",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Complete CNC Part Program Practice from Drawings",
+    "files": [
+      "Man Tech\\Module 3.4.pdf",
+      "Man Tech\\Haas VF-2 Programming Workbook.pdf"
+    ],
+    "description": "Write 3 complete CNC programs from component engineering drawings without referencing solutions. Verify syntax and coordinates.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_058",
+    "date": "2026-11-08",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Sleep 6.5 hours.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_059",
+    "date": "2026-11-08",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_060",
+    "date": "2026-11-08",
+    "start": "08:00",
+    "end": "10:30",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Metrology, Interferometry & Surface Roughness",
+    "files": [
+      "Man Tech\\Module 4.1.pdf"
+    ],
+    "description": "Optical flats, fringe pattern analysis for flatness and parallelism, autocollimator, sine bar numerics, Ra, Rq, Rz, CLA calculations.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_061",
+    "date": "2026-11-08",
+    "start": "10:30",
+    "end": "10:45",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Hydration / Stretch",
+    "files": [],
+    "description": "15-min break.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_062",
+    "date": "2026-11-08",
+    "start": "10:45",
+    "end": "13:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Limits, Fits, Tolerances & Taylor Gauge Design",
+    "files": [
+      "Man Tech\\Module 4.2.pdf"
+    ],
+    "description": "ISO tolerance grades (IT01-IT16), fundamental deviations, hole-basis vs shaft-basis, clearance/transition/interference, Taylor's principle, GO/NO-GO gauge tolerance allocation.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_063",
+    "date": "2026-11-08",
+    "start": "13:00",
+    "end": "14:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch",
+    "files": [],
+    "description": "Lunch.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_064",
+    "date": "2026-11-08",
+    "start": "14:00",
+    "end": "17:00",
+    "type": "STUDY",
+    "subject": "Heat Transfer",
+    "topic": "STRATEGIC PRE-LOAD: Conduction Core & Extended Surfaces (Fins)",
+    "files": [
+      "Heat Transfer\\Notes\\Lec01_Intro.pdf",
+      "Heat Transfer\\Notes\\Lec02_Conduction_intro.pdf",
+      "Heat Transfer\\Notes\\Lec03_Heat diffusion equation.pdf",
+      "Heat Transfer\\Notes\\Lec07_Composite_walls.pdf",
+      "Heat Transfer\\Notes\\Lec10_Fin boundary conditions.pdf",
+      "Heat Transfer\\Notes\\Lec11_fin efficiency.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-1 solutions.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-2A solutions-1.pdf"
+    ],
+    "description": "CRITICAL TACTICAL PRE-LOAD: Pre-solve Heat Transfer conduction and fins now so Nov 14 exam (back-to-back with FOTE) is completely secure!",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_065",
+    "date": "2026-11-08",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Walk / Refresh",
+    "files": [],
+    "description": "Exercise / mental reset.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_066",
+    "date": "2026-11-08",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "High-Speed SGB Design Drill & Numerical Mastery",
+    "files": [
+      "Man Tech\\Module 2.1.pdf",
+      "Man Tech\\ME3305 T1.pdf"
+    ],
+    "description": "Solve 3 complete SGB design problems from scratch: 12-speed and 18-speed gearboxes, ray diagrams, checking allowable speed deviation (+/- 2-3%).",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_067",
+    "date": "2026-11-08",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_068",
+    "date": "2026-11-08",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Man Tech Comprehensive Formula Sheet & Active Recall",
+    "files": [
+      "Man Tech\\Module 0.pdf",
+      "Man Tech\\Module 1.1.pdf",
+      "Man Tech\\Module 2.1.pdf",
+      "Man Tech\\Module 3.1.pdf",
+      "Man Tech\\Module 4.1.pdf",
+      "Man Tech\\Module 4.2.pdf"
+    ],
+    "description": "Condense all Man Tech equations and rules into a 4-page master revision sheet. Self-quiz on every single module.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_069",
+    "date": "2026-11-09",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Sleep 6.5 hours.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_070",
+    "date": "2026-11-09",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_071",
+    "date": "2026-11-09",
+    "start": "08:00",
+    "end": "11:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Full Timed Mock Exam Simulation",
+    "files": [
+      "Man Tech\\ME3305 T1.pdf",
+      "Man Tech\\ME3305 T2.pdf"
+    ],
+    "description": "Sit for 3-hour uninterrupted timed exam test covering SGB design, CNC programming, gauge tolerances, and metrology.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_072",
+    "date": "2026-11-09",
+    "start": "11:00",
+    "end": "11:15",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Break",
+    "files": [],
+    "description": "Short walk.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_073",
+    "date": "2026-11-09",
+    "start": "11:15",
+    "end": "13:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Error Analysis & Syntax Lock-In",
+    "files": [
+      "Man Tech\\Haas VF-2 Programming Workbook.pdf"
+    ],
+    "description": "Analyze mock exam mistakes. Drill G/M codes and ray diagram spacing until 100% automatic.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_074",
+    "date": "2026-11-09",
+    "start": "13:00",
+    "end": "14:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch",
+    "files": [],
+    "description": "Lunch.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_075",
+    "date": "2026-11-09",
+    "start": "14:00",
+    "end": "17:00",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "STRATEGIC PRE-LOAD: IC Engine Cycles & Testing Parameters",
+    "files": [
+      "FOTE\\IC engines_Module 2_Air Standard Cycles.pdf",
+      "FOTE\\IC_Engines_Module 3_VTD_Testing Parameters.pdf",
+      "FOTE\\Tutorial1.pdf",
+      "FOTE\\Tutorial2.pdf"
+    ],
+    "description": "Air standard Otto, Diesel, Dual derivations, mean effective pressure, indicated/brake thermal efficiency, Morse test numerics.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_076",
+    "date": "2026-11-09",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Evening Tea & Walk",
+    "files": [],
+    "description": "Recharge before final Man Tech review.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_077",
+    "date": "2026-11-09",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Final Slide-by-Slide Syllabus Lockdown",
+    "files": [
+      "Man Tech\\Module 0.pdf",
+      "Man Tech\\Module 1.1.pdf",
+      "Man Tech\\Module 2.1.pdf",
+      "Man Tech\\Module 2.2.pdf",
+      "Man Tech\\Module 3.1.pdf",
+      "Man Tech\\Module 3.2.pdf",
+      "Man Tech\\Module 3.3.pdf",
+      "Man Tech\\Module 3.4.pdf",
+      "Man Tech\\Module 4.1.pdf",
+      "Man Tech\\Module 4.2.pdf"
+    ],
+    "description": "Final review of all modules. Ensure every edge concept and diagram is memorized.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_078",
+    "date": "2026-11-09",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_079",
+    "date": "2026-11-09",
+    "start": "21:45",
+    "end": "23:15",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Formula Sheet & Confidence Lockdown",
+    "files": [],
+    "description": "Glance through formula sheet. Calm mental preparation.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_080",
+    "date": "2026-11-09",
+    "start": "23:15",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Deep Sleep (Pre-Exam)",
+    "files": [],
+    "description": "7.75 hours deep rest before 11-credit exam!",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_081",
+    "date": "2026-11-10",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_082",
+    "date": "2026-11-10",
+    "start": "08:00",
+    "end": "08:45",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Pre-Exam Warmup",
+    "files": [],
+    "description": "Formula sheet quick look.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_083",
+    "date": "2026-11-10",
+    "start": "09:00",
+    "end": "12:00",
+    "type": "EXAM",
+    "subject": "Man Tech",
+    "topic": "MAN TECH END SEM EXAM (ME3305 - 11 CREDITS)",
+    "files": [],
+    "description": "Execute with absolute precision. Maximum credit weight conquered!",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_084",
+    "date": "2026-11-10",
+    "start": "12:00",
+    "end": "13:30",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Post-Exam Lunch & Extended Rest",
+    "files": [],
+    "description": "Celebratory meal and power nap.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_085",
+    "date": "2026-11-10",
+    "start": "13:30",
+    "end": "17:00",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "Combustion Reactions, Stoichiometry & IC Emissions",
+    "files": [
+      "FOTE\\IC Engines_Module 4_Combustion and Emission.pdf",
+      "FOTE\\IC Engines_Module 5_2 Stroke Engines.pdf",
+      "FOTE\\IC Engines_Module 6_Application_Types.pdf",
+      "FOTE\\IC Engines_Module 7_Special Topics.pdf",
+      "FOTE\\Tutorial3.pdf"
+    ],
+    "description": "First law combustion analysis, adiabatic flame temperature derivations, normal/abnormal combustion, knocking, octane/cetane rating, alternate fuels.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_086",
+    "date": "2026-11-10",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Walk / Refresh",
+    "files": [],
+    "description": "30-min break.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_087",
+    "date": "2026-11-10",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "Turbomachinery: Euler Equation, Velocity Triangles & Degree of Reaction",
+    "files": [
+      "FOTE\\Turbomachinery_Module 1_Introduction.pdf",
+      "FOTE\\Turbomachinery_Module 2_Theory.pdf",
+      "FOTE\\Tutorial 4.docx"
+    ],
+    "description": "Euler turbomachine equation derivation, velocity triangles for axial and radial stages, degree of reaction R, non-dimensional parameters.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_088",
+    "date": "2026-11-10",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_089",
+    "date": "2026-11-10",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "Turbomachine Performance & Compressible Flow in Nozzles",
+    "files": [
+      "FOTE\\Turbomachinery_Module 3_Performance.pdf",
+      "FOTE\\Tutorial 5.pdf",
+      "FOTE\\Tutorial 6.docx",
+      "FOTE\\ME3105_Quiz1_solution.docx",
+      "FOTE\\Quiz II solutions.pdf"
+    ],
+    "description": "1D compressible flow in CD nozzles, choked flow conditions, Mach number relations, isentropic and stage efficiencies.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_090",
+    "date": "2026-11-11",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Sleep 6.5 hours.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_091",
+    "date": "2026-11-11",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_092",
+    "date": "2026-11-11",
+    "start": "08:00",
+    "end": "11:30",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "Complete Tutorial & Quiz Problem Marathon",
+    "files": [
+      "FOTE\\Tutorial1.pdf",
+      "FOTE\\Tutorial2.pdf",
+      "FOTE\\Tutorial3.pdf",
+      "FOTE\\Tutorial 4.docx",
+      "FOTE\\Tutorial 5.pdf",
+      "FOTE\\Tutorial 6.docx",
+      "FOTE\\ME3105_Quiz1_solution.docx",
+      "FOTE\\Quiz II solutions.pdf"
+    ],
+    "description": "Re-solve every single tutorial problem and quiz solution. Solidify speed and accuracy.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_093",
+    "date": "2026-11-11",
+    "start": "11:30",
+    "end": "11:45",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Stretch",
+    "files": [],
+    "description": "15-min break.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_094",
+    "date": "2026-11-11",
+    "start": "11:45",
+    "end": "13:00",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "IC Engine Testing Calculations & Heat Balance Sheet",
+    "files": [
+      "FOTE\\IC_Engines_Module 3_VTD_Testing Parameters.pdf"
+    ],
+    "description": "Master brake power, indicated power, friction power, mechanical efficiency, and complete heat balance sheet calculations.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_095",
+    "date": "2026-11-11",
+    "start": "13:00",
+    "end": "14:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch",
+    "files": [],
+    "description": "Lunch.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_096",
+    "date": "2026-11-11",
+    "start": "14:00",
+    "end": "17:30",
+    "type": "STUDY",
+    "subject": "Heat Transfer",
+    "topic": "Convection & Boundary Layer Correlations",
+    "files": [
+      "Heat Transfer\\Notes\\Lec 13.pdf",
+      "Heat Transfer\\Notes\\Lec 16.pdf",
+      "Heat Transfer\\Notes\\Lec 19.pdf",
+      "Heat Transfer\\Notes\\Lec 22.pdf",
+      "Heat Transfer\\Additional materials\\Free convection correlations-1.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-4 solutions-1.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-5 solutions-2.pdf"
+    ],
+    "description": "Laminar/turbulent boundary layers on flat plate, flow inside tubes (Dittus-Boelter, Gnielinski), free convection correlations (Rayleigh, Grashof).",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_097",
+    "date": "2026-11-11",
+    "start": "17:30",
+    "end": "18:00",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Evening Break",
+    "files": [],
+    "description": "Walk & tea.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_098",
+    "date": "2026-11-11",
+    "start": "18:00",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Heat Transfer",
+    "topic": "Heat Exchangers: LMTD & NTU Method Mastery",
+    "files": [
+      "Heat Transfer\\Notes\\Lec 27.pdf",
+      "Heat Transfer\\Notes\\Lec 28.pdf",
+      "Heat Transfer\\Notes\\Lec 29.pdf",
+      "Heat Transfer\\Additional materials\\HEX_effectiveness-NTU relations(1).docx",
+      "Heat Transfer\\Additional materials\\Heat Exchanger charts(2).docx",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-7 solutions-1_1-2.pdf"
+    ],
+    "description": "Effectiveness-NTU derivations, shell and tube heat exchanger correction factor F, crossflow heat exchanger charts.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_099",
+    "date": "2026-11-11",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_100",
+    "date": "2026-11-11",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "Turbomachinery Velocity Triangle Drill",
+    "files": [
+      "FOTE\\Turbomachinery_Module 1_Introduction.pdf",
+      "FOTE\\Turbomachinery_Module 2_Theory.pdf"
+    ],
+    "description": "Draw and solve 6 velocity triangle configurations under exam conditions.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_101",
+    "date": "2026-11-12",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Sleep 6.5 hours.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_102",
+    "date": "2026-11-12",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_103",
+    "date": "2026-11-12",
+    "start": "08:00",
+    "end": "11:30",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "FOTE Full Mock Paper & Time Trial",
+    "files": [
+      "FOTE\\ECS_quiz2_2024.pdf",
+      "FOTE\\Quiz II solutions.pdf"
+    ],
+    "description": "Timed problem solving covering all modules.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_104",
+    "date": "2026-11-12",
+    "start": "11:30",
+    "end": "11:45",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Break",
+    "files": [],
+    "description": "Short walk.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_105",
+    "date": "2026-11-12",
+    "start": "11:45",
+    "end": "13:00",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "2-Stroke Port Timing, Scavenging & Alternate Fuels",
+    "files": [
+      "FOTE\\IC Engines_Module 5_2 Stroke Engines.pdf",
+      "FOTE\\IC Engines_Module 7_Special Topics.pdf"
+    ],
+    "description": "Crankcase scavenging, loop/uniflow scavenging, hydrogen and biodiesel combustion properties.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_106",
+    "date": "2026-11-12",
+    "start": "13:00",
+    "end": "14:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch",
+    "files": [],
+    "description": "Lunch.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_107",
+    "date": "2026-11-12",
+    "start": "14:00",
+    "end": "17:00",
+    "type": "STUDY",
+    "subject": "Heat Transfer",
+    "topic": "Radiation Heat Transfer & View Factors",
+    "files": [
+      "Heat Transfer\\Notes\\Lec 34.pdf",
+      "Heat Transfer\\Notes\\Lec 35.pdf",
+      "Heat Transfer\\Notes\\Notes of lec 40.pdf",
+      "Heat Transfer\\Notes\\Notes of lec 41.pdf",
+      "Heat Transfer\\Notes\\Notes of lec 42.pdf",
+      "Heat Transfer\\Additional materials\\Blackbody radiation_F_ function(2).docx",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-9 solutions-1.pdf"
+    ],
+    "description": "Planck's law, Wien's displacement, Stefan-Boltzmann, view factor algebra, radiation shape factor summation/reciprocity, radiation network for 2-surface and 3-surface enclosures.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_108",
+    "date": "2026-11-12",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Evening Break",
+    "files": [],
+    "description": "Tea / Walk.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_109",
+    "date": "2026-11-12",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "FOTE Formula Sheet & Complete Syllabus Flash Review",
+    "files": [
+      "FOTE\\IC Engines_Module 1_Introduction.pdf",
+      "FOTE\\IC engines_Module 2_Air Standard Cycles.pdf",
+      "FOTE\\IC_Engines_Module 3_VTD_Testing Parameters.pdf",
+      "FOTE\\IC Engines_Module 4_Combustion and Emission.pdf",
+      "FOTE\\Turbomachinery_Module 1_Introduction.pdf",
+      "FOTE\\Turbomachinery_Module 2_Theory.pdf",
+      "FOTE\\Turbomachinery_Module 3_Performance.pdf"
+    ],
+    "description": "Review every slide, derive every cycle efficiency once more, memorize velocity triangle labels.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_110",
+    "date": "2026-11-12",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_111",
+    "date": "2026-11-12",
+    "start": "21:45",
+    "end": "23:30",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "Final Formula Lockdown & Quiet Review",
+    "files": [],
+    "description": "Quiet review of formulas. Early bedtime before tomorrow's exam.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_112",
+    "date": "2026-11-12",
+    "start": "23:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "7.5 hours deep sleep.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_113",
+    "date": "2026-11-13",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_114",
+    "date": "2026-11-13",
+    "start": "08:00",
+    "end": "08:45",
+    "type": "STUDY",
+    "subject": "FOTE",
+    "topic": "Formula Sheet Quick Glance",
+    "files": [],
+    "description": "Final check before exam.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_115",
+    "date": "2026-11-13",
+    "start": "09:00",
+    "end": "12:00",
+    "type": "EXAM",
+    "subject": "FOTE",
+    "topic": "FOTE END SEM EXAM (ME3105)",
+    "files": [],
+    "description": "Execute with precision. Velocity triangles, cycle calculations, combustion equations.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_116",
+    "date": "2026-11-13",
+    "start": "12:00",
+    "end": "13:15",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch & Shift to Heat Transfer",
+    "files": [],
+    "description": "Lunch and switch focus entirely to Heat Transfer for tomorrow morning!",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_117",
+    "date": "2026-11-13",
+    "start": "13:15",
+    "end": "17:00",
+    "type": "STUDY",
+    "subject": "Heat Transfer",
+    "topic": "Conduction & Transient Heisler Charts Blitz",
+    "files": [
+      "Heat Transfer\\Notes\\Lec03_Heat diffusion equation.pdf",
+      "Heat Transfer\\Notes\\Lec07_Composite_walls.pdf",
+      "Heat Transfer\\Notes\\Lec10_Fin boundary conditions.pdf",
+      "Heat Transfer\\Notes\\Lec11_fin efficiency.pdf",
+      "Heat Transfer\\Notes\\Lec12_2D steady state_Analytical_solution.pdf",
+      "Heat Transfer\\Additional materials\\Heisler Charts.docx",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-1 solutions.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-2A solutions-1.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-3A solutions.pdf"
+    ],
+    "description": "Rapid re-solving of 1D/2D conduction, fin equations, Biot number check, lumped capacitance, Heisler chart readings.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_118",
+    "date": "2026-11-13",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Tea / Walk",
+    "files": [],
+    "description": "Clear head.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_119",
+    "date": "2026-11-13",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Heat Transfer",
+    "topic": "Convection Correlations & Heat Exchanger Effectiveness-NTU",
+    "files": [
+      "Heat Transfer\\Additional materials\\Free convection correlations-1.pdf",
+      "Heat Transfer\\Additional materials\\HEX_effectiveness-NTU relations(1).docx",
+      "Heat Transfer\\Additional materials\\Heat Exchanger charts(2).docx",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-4 solutions-1.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-5 solutions-2.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-6 solutions.pdf",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-7 solutions-1_1-2.pdf"
+    ],
+    "description": "Select correct empirical correlation for forced/free convection, solve heat exchanger rating and sizing problems.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_120",
+    "date": "2026-11-13",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_121",
+    "date": "2026-11-13",
+    "start": "21:45",
+    "end": "00:45",
+    "type": "STUDY",
+    "subject": "Heat Transfer",
+    "topic": "Radiation Enclosures, Shields & Formula Lockdown",
+    "files": [
+      "Heat Transfer\\Notes\\Notes of lec 40.pdf",
+      "Heat Transfer\\Notes\\Notes of lec 41.pdf",
+      "Heat Transfer\\Notes\\Notes of lec 42.pdf",
+      "Heat Transfer\\Additional materials\\Blackbody radiation_F_ function(2).docx",
+      "Heat Transfer\\Tutorials\\ME3101_Tut-9 solutions-1.pdf"
+    ],
+    "description": "Solve 3-surface radiation problems, radiation shields formula, blackbody radiation functions table, final formula sheet consolidation.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_122",
+    "date": "2026-11-14",
+    "start": "00:45",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "6.25 hours sleep before 10-credit Heat Transfer exam.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_123",
+    "date": "2026-11-14",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_124",
+    "date": "2026-11-14",
+    "start": "08:00",
+    "end": "08:45",
+    "type": "STUDY",
+    "subject": "Heat Transfer",
+    "topic": "Pre-Exam Formula Quick Glance",
+    "files": [],
+    "description": "Heisler chart axes, NTU equations, radiation constants.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_125",
+    "date": "2026-11-14",
+    "start": "09:00",
+    "end": "12:00",
+    "type": "EXAM",
+    "subject": "Heat Transfer",
+    "topic": "HEAT TRANSFER END SEM EXAM (ME3101 - 10 CREDITS)",
+    "files": [],
+    "description": "Execute 10 credits! Conduction, convection, heat exchangers, radiation.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_126",
+    "date": "2026-11-14",
+    "start": "12:00",
+    "end": "13:30",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch & Shift to Control Systems",
+    "files": [],
+    "description": "Lunch and transition mindset to Control Systems Theory.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_127",
+    "date": "2026-11-14",
+    "start": "13:30",
+    "end": "17:00",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "System Modeling, Block Diagrams & Time Response",
+    "files": [
+      "Control Systems\\Lecture Notes\\Intro.pdf",
+      "Control Systems\\Lecture Notes\\System Modeling.pdf",
+      "Control Systems\\Lecture Notes\\Time Response.pdf"
+    ],
+    "description": "Transfer functions, electrical/mechanical analogies, Mason's gain formula, 1st & 2nd order transient response (zeta, omega_n, Mp, tp, tr, ts), steady-state errors (Kp, Kv, Ka).",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_128",
+    "date": "2026-11-14",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Tea / Walk",
+    "files": [],
+    "description": "Recharge.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_129",
+    "date": "2026-11-14",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Stability & Root Locus Techniques",
+    "files": [
+      "Control Systems\\Lecture Notes\\Stability.pdf",
+      "Control Systems\\Lecture Notes\\Controller Design_ RL_Freq.pdf",
+      "Control Systems\\Tutorial 2.pdf"
+    ],
+    "description": "Routh-Hurwitz criteria (special cases), Root locus sketch rules, asymptotes, breakaway points, imaginary axis crossings, angle of departure/arrival.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_130",
+    "date": "2026-11-14",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_131",
+    "date": "2026-11-14",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Frequency Response: Bode Plots & Nyquist Criterion",
+    "files": [
+      "Control Systems\\Lecture Notes\\Controller Design_ RL_Freq.pdf",
+      "Control Systems\\ME4010 Practice Problems 3.pdf"
+    ],
+    "description": "Bode magnitude and phase construction, gain margin, phase margin, Nyquist diagram contour mapping, stability criterion Z = N + P.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_132",
+    "date": "2026-11-15",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Sleep 6.5 hours.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_133",
+    "date": "2026-11-15",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_134",
+    "date": "2026-11-15",
+    "start": "08:00",
+    "end": "11:00",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "State Space Design: Controllability, Observability & Observers",
+    "files": [
+      "Control Systems\\Lecture Notes\\Controller Design_ StateSpace.pdf"
+    ],
+    "description": "State transition matrix, state feedback pole placement (Ackermann's formula), observer design, dual observer-controller separation principle.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_135",
+    "date": "2026-11-15",
+    "start": "11:00",
+    "end": "11:15",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Break",
+    "files": [],
+    "description": "Short break.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_136",
+    "date": "2026-11-15",
+    "start": "11:15",
+    "end": "13:00",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Lead, Lag, Lead-Lag Compensator & PID Tuning",
+    "files": [
+      "Control Systems\\Lecture Notes\\Controller Design_ RL_Freq.pdf"
+    ],
+    "description": "Compensator design via Root Locus and Bode techniques, Ziegler-Nichols tuning rules, gain and phase lead calculation.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_137",
+    "date": "2026-11-15",
+    "start": "13:00",
+    "end": "14:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch",
+    "files": [],
+    "description": "Lunch.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_138",
+    "date": "2026-11-15",
+    "start": "14:00",
+    "end": "17:30",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Practice Problems & Tutorial Problem Solving Blitz",
+    "files": [
+      "Control Systems\\ME4010 Practice Problems 3.pdf",
+      "Control Systems\\Tutorial 2.pdf",
+      "Control Systems\\ogata.pdf"
+    ],
+    "description": "Solve 8 complex numerical problems from Ogata and practice problems under exam timing.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_139",
+    "date": "2026-11-15",
+    "start": "17:30",
+    "end": "18:00",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Walk / Refresh",
+    "files": [],
+    "description": "30-min break.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_140",
+    "date": "2026-11-15",
+    "start": "18:00",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Comprehensive Formula Sheet & Nyquist Trap Checklist",
+    "files": [
+      "Control Systems\\Lecture Notes\\System Modeling.pdf",
+      "Control Systems\\Lecture Notes\\Time Response.pdf",
+      "Control Systems\\Lecture Notes\\Stability.pdf",
+      "Control Systems\\Lecture Notes\\Controller Design_ RL_Freq.pdf",
+      "Control Systems\\Lecture Notes\\Controller Design_ StateSpace.pdf"
+    ],
+    "description": "Write out full formula sheet, review Nyquist encirclement subtleties and Routh array edge cases.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_141",
+    "date": "2026-11-15",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_142",
+    "date": "2026-11-15",
+    "start": "21:45",
+    "end": "23:30",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Final Review & Rest",
+    "files": [],
+    "description": "Light review and early sleep.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_143",
+    "date": "2026-11-15",
+    "start": "23:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "7.5 hours rest.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_144",
+    "date": "2026-11-16",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_145",
+    "date": "2026-11-16",
+    "start": "08:00",
+    "end": "08:45",
+    "type": "STUDY",
+    "subject": "Control Systems",
+    "topic": "Formula Quick Glance",
+    "files": [],
+    "description": "Ackermann formula, Bode slope rules.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_146",
+    "date": "2026-11-16",
+    "start": "09:00",
+    "end": "12:00",
+    "type": "EXAM",
+    "subject": "Control Systems",
+    "topic": "CONTROL SYSTEMS END SEM EXAM (ME4010 - 10 CREDITS)",
+    "files": [],
+    "description": "Execute 10 credits! State space, root locus, Bode/Nyquist, modeling.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_147",
+    "date": "2026-11-16",
+    "start": "12:00",
+    "end": "13:30",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch & Shift to Machine Design",
+    "files": [],
+    "description": "Lunch and transition mindset to Machine Design component calculations.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_148",
+    "date": "2026-11-16",
+    "start": "13:30",
+    "end": "17:00",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Static Failure Theories, Fatigue & Shaft Design",
+    "files": [
+      "Machine Design\\Notes\\StaticLoad.pdf",
+      "Machine Design\\Notes\\FluctuatingLoad.pdf",
+      "Machine Design\\Notes\\Shafts.pdf",
+      "Machine Design\\formula_reference.md",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial1.pdf",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial2.pdf"
+    ],
+    "description": "von Mises, Tresca, endurance limit Marin factors, Goodman/Soderberg/Gerber failure criteria, ASME shaft design equation under bending and torsion.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_149",
+    "date": "2026-11-16",
+    "start": "17:00",
+    "end": "17:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Tea / Walk",
+    "files": [],
+    "description": "30-min break.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_150",
+    "date": "2026-11-16",
+    "start": "17:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Threaded Fasteners, Keys & Helical Springs",
+    "files": [
+      "Machine Design\\Notes\\Fasteners.pdf",
+      "Machine Design\\Notes\\Keys.pdf",
+      "Machine Design\\Notes\\Springs.pdf",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial3.pdf",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial4.pdf"
+    ],
+    "description": "Bolted joint stiffness (kb, km), preload, eccentric bolted joints, square/flat keys shear & crushing, helical spring Wahl factor, spring surging.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_151",
+    "date": "2026-11-16",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_152",
+    "date": "2026-11-16",
+    "start": "21:45",
+    "end": "00:30",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Rolling Element & Hydrodynamic Journal Bearings",
+    "files": [
+      "Machine Design\\Notes\\RollingElementBearings.pdf",
+      "Machine Design\\Notes\\JournalBearings.pdf",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial5.pdf",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial6.pdf"
+    ],
+    "description": "Bearing L10 life rating, equivalent dynamic load P = X*Fr + Y*Fa, Petroff equation, Sommerfeld number, Raimondi-Boyd charts for ho, friction, oil flow.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_153",
+    "date": "2026-11-17",
+    "start": "00:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "Sleep 6.5 hours.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_154",
+    "date": "2026-11-17",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_155",
+    "date": "2026-11-17",
+    "start": "08:00",
+    "end": "11:30",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Spur Gear Design & Buckingham Wear Equations",
+    "files": [
+      "Machine Design\\Notes\\Gears.pdf",
+      "Machine Design\\Notes\\DesignOfSpurGears.pdf",
+      "Machine Design\\Questions and Tutorials\\gear_solutions.pdf",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial7.pdf",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial8.pdf"
+    ],
+    "description": "Lewis beam strength equation, Barth velocity factor, Buckingham dynamic load equation, surface fatigue wear load Fw = dp * b * Q * K.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_156",
+    "date": "2026-11-17",
+    "start": "11:30",
+    "end": "11:45",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Break",
+    "files": [],
+    "description": "Short walk.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_157",
+    "date": "2026-11-17",
+    "start": "11:45",
+    "end": "13:00",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Quiz Solutions & Tricky Edge Case Review",
+    "files": [
+      "Machine Design\\Quiz 1 solutions.pdf",
+      "Machine Design\\Quiz 2-solution.pdf",
+      "Machine Design\\Questions and Tutorials\\PracticeProblems1.pdf",
+      "Machine Design\\Questions and Tutorials\\PracticeProblems2.pdf",
+      "Machine Design\\Questions and Tutorials\\PracticeProblems3.pdf"
+    ],
+    "description": "Analyze all past quiz questions, common pitfall errors, and practice problem edge cases.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_158",
+    "date": "2026-11-17",
+    "start": "13:00",
+    "end": "14:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Lunch",
+    "files": [],
+    "description": "Lunch.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_159",
+    "date": "2026-11-17",
+    "start": "14:00",
+    "end": "17:30",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Comprehensive Machine Design Problem Solving Drill",
+    "files": [
+      "Machine Design\\formula_reference.md",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial7.pdf",
+      "Machine Design\\Questions and Tutorials\\ME3203_Tutorial8.pdf"
+    ],
+    "description": "Solve 2 comprehensive integrated problems: Shaft carrying spur gear mounted on rolling/journal bearings with fluctuating loads.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_160",
+    "date": "2026-11-17",
+    "start": "17:30",
+    "end": "18:00",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Walk / Refresh",
+    "files": [],
+    "description": "Tea and walk.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_161",
+    "date": "2026-11-17",
+    "start": "18:00",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Design Data Hand-Book Navigation & Master Formula Sheet",
+    "files": [
+      "Machine Design\\formula_reference.md"
+    ],
+    "description": "Speed drill looking up charts (Raimondi-Boyd, Marin factors, gear form factors). Condense all formulas into a 3-page quick reference.",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_162",
+    "date": "2026-11-17",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_163",
+    "date": "2026-11-17",
+    "start": "21:45",
+    "end": "23:30",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Final Equation Lockdown & Mental Rehearsal",
+    "files": [],
+    "description": "Review final equations. Calm confidence.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_164",
+    "date": "2026-11-17",
+    "start": "23:30",
+    "end": "07:00",
+    "type": "SLEEP",
+    "subject": "Routine",
+    "topic": "Sleep",
+    "files": [],
+    "description": "7.5 hours rest before final theory exam.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_165",
+    "date": "2026-11-18",
+    "start": "07:30",
+    "end": "08:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Breakfast",
+    "files": [],
+    "description": "Breakfast at 7:30 AM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_166",
+    "date": "2026-11-18",
+    "start": "08:00",
+    "end": "08:45",
+    "type": "STUDY",
+    "subject": "Machine Design",
+    "topic": "Pre-Exam Formula Quick Glance",
+    "files": [],
+    "description": "Formula reference quick look.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_167",
+    "date": "2026-11-18",
+    "start": "09:00",
+    "end": "12:00",
+    "type": "EXAM",
+    "subject": "Machine Design",
+    "topic": "MACHINE DESIGN END SEM EXAM (ME3203)",
+    "files": [],
+    "description": "Execute with precision! ALL WRITTEN THEORY PAPERS COMPLETED!",
+    "priority": "CRITICAL"
+  },
+  {
+    "id": "blk_168",
+    "date": "2026-11-18",
+    "start": "12:00",
+    "end": "14:00",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Celebratory Lunch & Recovery",
+    "files": [],
+    "description": "Celebrate conquering all theory exams! Take a solid 2-hour rest.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_169",
+    "date": "2026-11-18",
+    "start": "14:00",
+    "end": "18:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Man Tech Report: Data Compilation & Haas Code Documentation",
+    "files": [
+      "Man Tech\\Haas VF-2 Programming Workbook.pdf"
+    ],
+    "description": "Assemble machining experimental data, Haas toolpaths, CNC code listings, and dimensional inspection results.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_170",
+    "date": "2026-11-18",
+    "start": "18:00",
+    "end": "18:30",
+    "type": "BREAK",
+    "subject": "Routine",
+    "topic": "Break",
+    "files": [],
+    "description": "Recharge.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_171",
+    "date": "2026-11-18",
+    "start": "18:30",
+    "end": "21:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Man Tech Report: Discussion, Calculations & Drawings",
+    "files": [
+      "Man Tech\\Module 3.2.pdf",
+      "Man Tech\\Module 4.2.pdf"
+    ],
+    "description": "Draft report sections: tolerance analysis, tool wear observations, surface roughness discussion.",
+    "priority": "HIGH"
+  },
+  {
+    "id": "blk_172",
+    "date": "2026-11-18",
+    "start": "21:00",
+    "end": "21:45",
+    "type": "MEAL",
+    "subject": "Routine",
+    "topic": "Dinner",
+    "files": [],
+    "description": "Dinner at 9 PM.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_173",
+    "date": "2026-11-18",
+    "start": "21:45",
+    "end": "00:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Man Tech Report: Draft Compilation",
+    "files": [],
+    "description": "Draft complete report document.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_174",
+    "date": "2026-11-19",
+    "start": "09:00",
+    "end": "13:00",
+    "type": "STUDY",
+    "subject": "Man Tech",
+    "topic": "Man Tech Report: Final Polish & Formatting",
+    "files": [
+      "Man Tech\\Haas VF-2 Programming Workbook.pdf"
+    ],
+    "description": "Proofread calculations, check plot labels, finalize figures.",
+    "priority": "NORMAL"
+  },
+  {
+    "id": "blk_175",
+    "date": "2026-11-20",
+    "start": "14:00",
+    "end": "17:00",
+    "type": "SUBMISSION",
+    "subject": "Man Tech",
+    "topic": "FINAL SUBMISSION: Man Tech Report",
+    "files": [],
+    "description": "Submit final Man Tech report! SEMESTER 5 OFFICIALLY AND FULLY COMPLETE!",
+    "priority": "CRITICAL"
+  }
+];
+    let selectedDate = "2026-11-03";
+    let notifsEnabled = false;
+    let lastNotifiedBlockId = null;
+
+    // Immediate synchronous initialization from embedded schedule
+    function initSchedule() {
+      try {
+        const savedDone = JSON.parse(localStorage.getItem('apex_done_blocks') || '{}');
+        fullSchedule.forEach(b => {
+          if (savedDone[b.id] !== undefined) b.done = savedDone[b.id];
+        });
+      } catch (e) {
+        console.warn("Storage error", e);
+      }
+
+      initDatePills();
+      updateHUD();
+      renderTimeline();
+
+      // Background sync if online
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/schedule')
+          .then(r => r.json())
+          .then(data => {
+            if (data && data.length > 0) {
+              fullSchedule = data;
+              initDatePills();
+              updateHUD();
+              renderTimeline();
+            }
+          })
+          .catch(() => {});
+      }
+    }
+
+    function initDatePills() {
+      const dates = [...new Set(fullSchedule.map(s => s.date))].sort();
+      const container = document.getElementById('datePills');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+      dates.forEach(d => {
+        const pill = document.createElement('div');
+        pill.className = `date-pill ${d === selectedDate ? 'active' : ''}`;
+        
+        const parts = d.split('-');
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const dayNum = parseInt(parts[2], 10);
+        const dObj = new Date(y, m, dayNum);
+        const dayName = days[dObj.getDay()] || 'Day';
+        const monthDay = (months[m] || '') + ' ' + dayNum;
+        
+        pill.innerHTML = `<div>${dayName}</div><div style="font-size:0.85rem">${monthDay}</div>`;
+        pill.onclick = () => {
+          selectedDate = d;
+          document.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          renderTimeline();
+        };
+        container.appendChild(pill);
+      });
+    }
+
+    function updateHUD() {
+      const now = new Date();
+      // If today is Nov 3, 2026 or current simulated time:
+      const todayStr = now.toISOString().slice(0, 10);
+      const currentTimeStr = now.toTimeString().slice(0, 5);
+
+      // Find block that matches current time or next upcoming
+      let currentBlock = null;
+      let nextBlock = null;
+
+      for (let i = 0; i < fullSchedule.length; i++) {
+        const b = fullSchedule[i];
+        if (b.date === todayStr) {
+          if (currentTimeStr >= b.start && currentTimeStr < b.end) {
+            currentBlock = b;
+            nextBlock = fullSchedule[i + 1] || null;
+            break;
+          } else if (currentTimeStr < b.start) {
+            currentBlock = b; // Upcoming next
+            nextBlock = fullSchedule[i + 1] || null;
+            break;
+          }
+        }
+      }
+
+      // If no block found today, take earliest upcoming
+      if (!currentBlock) {
+        currentBlock = fullSchedule.find(b => b.date >= todayStr) || fullSchedule[0];
+      }
+
+      if (currentBlock) {
+        document.getElementById('hudStatus').innerText = 
+          (currentTimeStr >= currentBlock.start && currentTimeStr < currentBlock.end && currentBlock.date === todayStr)
+            ? "ACTIVE STUDY BLOCK"
+            : `UPCOMING: ${currentBlock.date} @ ${currentBlock.start}`;
+
+        document.getElementById('hudSubject').innerText = `[${currentBlock.subject.toUpperCase()}]`;
+        document.getElementById('hudTopic').innerText = currentBlock.topic;
+        document.getElementById('hudDesc').innerText = currentBlock.description;
+
+        const filesContainer = document.getElementById('hudFilesList');
+        filesContainer.innerHTML = '';
+        if (currentBlock.files && currentBlock.files.length > 0) {
+          document.getElementById('hudFilesBox').style.display = 'block';
+          currentBlock.files.forEach(f => {
+            const chip = document.createElement('div');
+            chip.className = 'file-chip';
+            chip.innerText = '📄 ' + f;
+            filesContainer.appendChild(chip);
+          });
+        } else {
+          document.getElementById('hudFilesBox').style.display = 'none';
+        }
+
+        if (nextBlock) {
+          document.getElementById('hudNext').innerText = `[${nextBlock.subject}] ${nextBlock.topic} (${nextBlock.start})`;
+        } else {
+          document.getElementById('hudNext').innerText = "Semester finish line in sight!";
+        }
+
+        // Trigger Notification if block changed
+        if (notifsEnabled && currentBlock.id !== lastNotifiedBlockId && currentTimeStr >= currentBlock.start) {
+          lastNotifiedBlockId = currentBlock.id;
+          playChime();
+          showNotification(currentBlock);
+        }
+      }
+    }
+
+    function renderTimeline() {
+      const container = document.getElementById('timelineList');
+      container.innerHTML = '';
+
+      const dayBlocks = fullSchedule.filter(b => b.date === selectedDate);
+      if (dayBlocks.length === 0) {
+        container.innerHTML = '<div style="color:#64748b; text-align:center; padding:30px;">No blocks scheduled for this day.</div>';
+        return;
+      }
+
+      dayBlocks.forEach(b => {
+        const card = document.createElement('div');
+        card.className = `slot-card ${b.done ? 'done' : ''}`;
+        
+        let badgeClass = 'badge-Class';
+        if (b.type === 'EXAM') badgeClass = 'badge-Exam';
+        else if (b.type === 'SUBMISSION') badgeClass = 'badge-Submission';
+        else if (b.type === 'MEAL' || b.type === 'SLEEP' || b.type === 'BREAK') badgeClass = 'badge-Routine';
+        else {
+          const sName = b.subject.replace(/\s+/g, '');
+          badgeClass = `badge-${sName}`;
+        }
+
+        const filesHtml = (b.files && b.files.length > 0)
+          ? `<div class="slot-files">📂 ${b.files.map(f => f.split('\\').pop()).join(', ')}</div>`
+          : '';
+
+        card.innerHTML = `
+          <div class="slot-time">
+            <div>${b.start}</div>
+            <div style="font-size:0.65rem; color:#64748b;">${b.end}</div>
+          </div>
+          <div class="slot-body">
+            <div class="slot-header">
+              <span class="subject-badge ${badgeClass}">${b.subject}</span>
+              <span style="font-size:0.65rem; color:#94a3b8; font-weight:700;">${b.priority || ''}</span>
+            </div>
+            <div class="slot-title">${b.topic}</div>
+            <div style="font-size:0.75rem; color:#94a3b8; line-height:1.3;">${b.description}</div>
+            ${filesHtml}
+          </div>
+          <div class="slot-check">
+            <input type="checkbox" class="custom-checkbox" ${b.done ? 'checked' : ''} onchange="toggleDone('${b.id}', this.checked)">
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleDone(id, isDone) {
+      const b = fullSchedule.find(x => x.id === id);
+      if (b) {
+        b.done = isDone;
+        const savedDone = JSON.parse(localStorage.getItem('apex_done_blocks') || '{}');
+        savedDone[id] = isDone;
+        localStorage.setItem('apex_done_blocks', JSON.stringify(savedDone));
+        renderTimeline();
+      }
+    }
+
+    // Notifications Management
+    function toggleNotifications() {
+      if (!("Notification" in window)) {
+        alert("This browser does not support desktop notifications.");
+        return;
+      }
+
+      if (Notification.permission === "granted") {
+        notifsEnabled = !notifsEnabled;
+        updateNotifUI();
+        if (notifsEnabled) {
+          playChime();
+          new Notification("🔔 Apex Study Alerts ACTIVE", {
+            body: "You will receive notifications at each study block with the exact subject and folder files.",
+            icon: "icon.png"
+          });
+        }
+      } else {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            notifsEnabled = true;
+            updateNotifUI();
+            playChime();
+            new Notification("🔔 Notifications Enabled", {
+              body: "Study alerts configured for Sem 5 exams.",
+              icon: "icon.png"
+            });
+          }
+        });
+      }
+    }
+
+    function updateNotifUI() {
+      const btn = document.getElementById('btnNotif');
+      if (notifsEnabled) {
+        btn.classList.add('active');
+        btn.innerHTML = '🔔 Alerts ON';
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = '🔔 Alerts';
+      }
+    }
+
+    function showNotification(block) {
+      if (Notification.permission === "granted") {
+        const fileList = block.files && block.files.length > 0 
+          ? `Files: ${block.files.map(f => f.split('\\').pop()).join(', ')}` 
+          : block.description;
+
+        new Notification(`⏰ [${block.subject}] ${block.topic}`, {
+          body: fileList,
+          icon: "icon.png",
+          vibrate: [200, 100, 200]
+        });
+      }
+    }
+
+    // Live Dynamic Scanner
+    async function openScanner() {
+      document.getElementById('scannerModal').classList.add('open');
+      const listEl = document.getElementById('scannerFileList');
+      listEl.innerHTML = '<div style="color:#00e5ff;">Scanning D:\\Sem 5 directory...</div>';
+      try {
+        const res = await fetch('/api/scan_files');
+        const files = await res.json();
+        listEl.innerHTML = '';
+        files.slice(0, 40).forEach(f => {
+          const row = document.createElement('div');
+          row.style.padding = '8px';
+          row.style.borderBottom = '1px solid #1e293b';
+          row.style.fontSize = '0.78rem';
+          row.innerHTML = `
+            <div style="font-weight:700; color:#38bdf8;">${f.filename}</div>
+            <div style="color:#64748b; font-size:0.7rem;">Folder: ${f.folder} | ${f.size_kb} KB</div>
+          `;
+          listEl.appendChild(row);
+        });
+      } catch (e) {
+        listEl.innerHTML = '<div style="color:#ef4444;">Could not connect to scan server. Ensure study_server.py is running.</div>';
+      }
+    }
+
+    function closeScanner() {
+      document.getElementById('scannerModal').classList.remove('open');
+    }
+
+    // Refresh every minute
+    setInterval(updateHUD, 60000);
+
+    // Initial boot
+    initSchedule();
+  </script>
+</body>
+</html>
