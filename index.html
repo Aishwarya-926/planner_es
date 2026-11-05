@@ -21,6 +21,7 @@
       --danger: #ef4444;
       --purple: #8b5cf6;
       --pink: #ec4899;
+      --edit-accent: #f59e0b;
     }
 
     * {
@@ -35,44 +36,45 @@
       background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding-bottom: 70px;
+      padding-bottom: 80px;
       overflow-x: hidden;
     }
 
-    /* Top Header Bar */
+    /* Top App Header */
     .app-header {
       position: sticky;
       top: 0;
       z-index: 50;
       background: rgba(11, 15, 25, 0.96);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--card-border);
-      padding: 10px 16px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .header-logo {
       font-size: 1rem;
       font-weight: 800;
       letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
-    .live-pulse-badge {
-      background: rgba(16, 185, 129, 0.2);
+    .live-badge {
+      background: rgba(16, 185, 129, 0.18);
       color: var(--success);
       border: 1px solid var(--success);
       font-size: 0.65rem;
       padding: 2px 6px;
       border-radius: 4px;
       font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
       animation: pulse 1.8s infinite;
     }
 
@@ -83,28 +85,28 @@
 
     .header-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .btn-header {
+    .btn-hdr {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--text);
-      padding: 6px 10px;
+      padding: 6px 9px;
       border-radius: 6px;
       font-size: 0.72rem;
       font-weight: 700;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
-      cursor: pointer;
-      text-decoration: none;
     }
 
-    .btn-header.active {
-      background: var(--accent);
-      color: #0b0f19;
-      border-color: var(--accent);
+    .btn-edit-mode.active {
+      background: var(--edit-accent);
+      color: #000;
+      border-color: var(--edit-accent);
+      font-weight: 800;
     }
 
     .btn-cal {
@@ -113,31 +115,31 @@
       color: #38bdf8;
     }
 
-    /* Container */
     .container {
-      padding: 14px 16px;
+      padding: 12px 14px;
       max-width: 680px;
       margin: 0 auto;
     }
 
     /* ACTIVE SESSION HERO CARD */
-    .hud-hero {
+    .hero-card {
       background: linear-gradient(135deg, #131a29 0%, #1a253e 100%);
       border: 1.5px solid var(--accent);
       border-radius: 12px;
       padding: 16px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       box-shadow: 0 0 20px var(--accent-glow);
+      position: relative;
     }
 
-    .hud-meta-row {
+    .hero-meta {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
     }
 
-    .hud-status-badge {
+    .hero-status {
       font-size: 0.7rem;
       font-weight: 800;
       letter-spacing: 1.2px;
@@ -148,24 +150,27 @@
       gap: 6px;
     }
 
-    .dot {
+    .pulse-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       background: var(--accent);
-      display: inline-block;
       box-shadow: 0 0 8px var(--accent);
       animation: pulse 1.5s infinite;
     }
 
-    .hud-timer {
+    .hero-countdown {
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 800;
       color: #38bdf8;
       font-variant-numeric: tabular-nums;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid #334155;
     }
 
-    .hud-subject-tag {
+    .hero-subject-pill {
       display: inline-block;
       font-size: 0.75rem;
       font-weight: 800;
@@ -176,22 +181,22 @@
       margin-bottom: 6px;
     }
 
-    .hud-topic {
-      font-size: 1.15rem;
+    .hero-topic {
+      font-size: 1.18rem;
       font-weight: 800;
       color: #fff;
       line-height: 1.35;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    .hud-desc {
+    .hero-desc {
       font-size: 0.82rem;
       color: #cbd5e1;
       line-height: 1.45;
       margin-bottom: 12px;
     }
 
-    .hud-files-box {
+    .hero-files-box {
       background: rgba(11, 15, 25, 0.85);
       border: 1px dashed #38bdf8;
       border-radius: 8px;
@@ -199,7 +204,7 @@
       margin-bottom: 12px;
     }
 
-    .hud-files-label {
+    .hero-files-title {
       font-size: 0.68rem;
       font-weight: 800;
       color: #38bdf8;
@@ -208,7 +213,7 @@
       margin-bottom: 6px;
     }
 
-    .file-pill {
+    .file-chip {
       background: #1e293b;
       border: 1px solid #334155;
       color: #7dd3fc;
@@ -221,7 +226,7 @@
       word-break: break-all;
     }
 
-    .hud-next {
+    .hero-next {
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       padding-top: 8px;
       display: flex;
@@ -230,12 +235,49 @@
       color: var(--text-muted);
     }
 
-    /* Filter Chips */
+    /* Edit Mode Toolbar */
+    .edit-toolbar {
+      display: none;
+      background: #1f2937;
+      border: 1px solid var(--edit-accent);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .edit-toolbar.active {
+      display: flex;
+    }
+
+    .btn-add-session {
+      background: var(--edit-accent);
+      color: #000;
+      border: none;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-reset-sched {
+      background: #374151;
+      color: #f87171;
+      border: 1px solid #4b5563;
+      font-size: 0.72rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Filter Bar */
     .filter-bar {
       display: flex;
       gap: 6px;
       overflow-x: auto;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       margin-bottom: 10px;
       scrollbar-width: none;
     }
@@ -245,7 +287,7 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--text-muted);
-      padding: 6px 12px;
+      padding: 6px 11px;
       border-radius: 6px;
       font-size: 0.72rem;
       font-weight: 700;
@@ -262,9 +304,9 @@
     /* Date Pills Bar */
     .date-bar {
       display: flex;
-      gap: 8px;
+      gap: 7px;
       overflow-x: auto;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       margin-bottom: 14px;
       scrollbar-width: none;
     }
@@ -305,12 +347,17 @@
       padding: 12px 14px;
       display: flex;
       gap: 12px;
+      position: relative;
       transition: all 0.2s ease;
     }
 
     .block-card.done {
       opacity: 0.45;
       filter: grayscale(0.6);
+    }
+
+    .block-card.editing {
+      border-color: var(--edit-accent);
     }
 
     .block-time {
@@ -352,7 +399,7 @@
     .sub-ManTech { background: #10b981; color: #fff; }
     .sub-FOTE { background: #f59e0b; color: #000; }
     .sub-MachineDesign { background: #ec4899; color: #fff; }
-    .sub-Projects { background: #3b82f6; color: #fff; }
+    .sub-ProjectsReview, .sub-Projects { background: #3b82f6; color: #fff; }
     .sub-Exam { background: #ef4444; color: #fff; font-weight: 900; animation: pulse 1.5s infinite; }
     .sub-Submit { background: #eab308; color: #000; font-weight: 900; }
     .sub-Class { background: #334155; color: #cbd5e1; }
@@ -384,9 +431,11 @@
       border-radius: 0 4px 4px 0;
     }
 
-    .block-check {
+    .block-actions-right {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
       padding-left: 4px;
     }
 
@@ -397,100 +446,298 @@
       cursor: pointer;
     }
 
-    /* Tab navigation at bottom */
-    .nav-tabs {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(11, 15, 25, 0.95);
-      border-top: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 0;
-      z-index: 40;
-    }
-
-    .tab-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      font-weight: 700;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
+    .btn-card-edit {
+      display: none;
+      background: #374151;
+      border: 1px solid var(--edit-accent);
+      color: var(--edit-accent);
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 0.68rem;
       cursor: pointer;
     }
 
-    .tab-btn.active {
-      color: var(--accent);
+    .btn-card-del {
+      display: none;
+      background: #374151;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 0.68rem;
+      cursor: pointer;
+    }
+
+    .is-editing .btn-card-edit,
+    .is-editing .btn-card-del {
+      display: block;
+    }
+
+    /* MODAL POPUP FOR EDITING & ADDING */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--edit-accent);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
+    }
+
+    .modal-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--edit-accent);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      background: #0b0f19;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--edit-accent);
+      outline: none;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .modal-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn-save {
+      background: var(--edit-accent);
+      color: #000;
+      font-weight: 800;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-cancel {
+      background: #374151;
+      color: #e5e7eb;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- App Header -->
   <header class="app-header">
-    <div class="header-logo">
-      <span>⚡ APEX STUDY</span>
-      <span class="live-pulse-badge">LIVE</span>
+    <div class="header-left">
+      <span class="header-logo">⚡ APEX STUDY</span>
+      <span class="live-badge" id="clockDisplay">LIVE</span>
     </div>
     <div class="header-actions">
-      <button id="btnNotif" class="btn-header" onclick="toggleAlerts()">
-        <span id="notifIcon">🔔</span> Alerts
+      <button id="btnEditToggle" class="btn-hdr btn-edit-mode" onclick="toggleEditMode()">
+        ✏️ Edit Mode
       </button>
-      <button class="btn-header btn-cal" onclick="downloadICS()">
+      <button class="btn-hdr btn-cal" onclick="downloadICS()">
         📅 Get .ics
       </button>
     </div>
   </header>
 
   <main class="container">
-    <!-- Active HUD Hero -->
-    <section class="hud-hero" id="heroCard">
-      <div class="hud-meta-row">
-        <span class="hud-status-badge">
-          <span class="dot"></span> <span id="heroStatus">ACTIVE STUDY BLOCK</span>
+    <!-- HERO HUD CARD (Auto Updates & Highlights) -->
+    <section class="hero-card" id="heroCard">
+      <div class="hero-meta">
+        <span class="hero-status">
+          <span class="pulse-dot"></span> <span id="heroStatusText">ACTIVE STUDY BLOCK</span>
         </span>
-        <span class="hud-timer" id="heroTimer">Live</span>
+        <span class="hero-countdown" id="heroCountdownTimer">00:00:00</span>
       </div>
-      <div id="heroSubjectTag" class="hud-subject-tag sub-HeatTransfer">HEAT TRANSFER</div>
-      <h2 class="hud-topic" id="heroTopic">Loading topic...</h2>
-      <p class="hud-desc" id="heroDesc"></p>
+      <div id="heroSubjectBadge" class="hero-subject-pill sub-ControlSystems">CONTROL SYSTEMS</div>
+      <h2 class="hero-topic" id="heroTopic">Analyzing schedule...</h2>
+      <p class="hero-desc" id="heroDesc"></p>
 
-      <div class="hud-files-box" id="heroFilesBox">
-        <div class="hud-files-label">📂 Exact Files in D:\Sem 5:</div>
+      <div class="hero-files-box" id="heroFilesBox">
+        <div class="hero-files-title">📂 Required Files in D:\Sem 5:</div>
         <div id="heroFilesList"></div>
       </div>
 
-      <div class="hud-next">
+      <div class="hero-next">
         <span>NEXT SESSION:</span>
-        <strong id="heroNext">Loading...</strong>
+        <strong id="heroNextText">Loading...</strong>
       </div>
     </section>
 
-    <!-- Subject Filters -->
-    <div class="filter-bar" id="filterBar">
-      <div class="filter-chip active" onclick="setSubjectFilter('ALL', this)">All Courses</div>
-      <div class="filter-chip" onclick="setSubjectFilter('Heat Transfer', this)">🔥 Heat Transfer (10 Cr)</div>
-      <div class="filter-chip" onclick="setSubjectFilter('Control Systems', this)">🎛️ Control Systems (10 Cr)</div>
-      <div class="filter-chip" onclick="setSubjectFilter('Man Tech', this)">⚙️ Man Tech (11 Cr)</div>
-      <div class="filter-chip" onclick="setSubjectFilter('FOTE', this)">🔥 FOTE (7 Cr)</div>
-      <div class="filter-chip" onclick="setSubjectFilter('Machine Design', this)">📐 Machine Design (8 Cr)</div>
+    <!-- Edit Mode Controls -->
+    <div class="edit-toolbar" id="editToolbar">
+      <span style="font-size:0.75rem; color:#f59e0b; font-weight:700;">✏️ Edit Mode Active</span>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-add-session" onclick="openAddModal()">➕ Add Session</button>
+        <button class="btn-reset-sched" onclick="resetSchedule()">↺ Reset</button>
+      </div>
     </div>
 
-    <!-- Date Pills Bar -->
+    <!-- Filter Bar -->
+    <div class="filter-bar" id="filterBar">
+      <div class="filter-chip active" onclick="setFilter('ALL', this)">All Courses</div>
+      <div class="filter-chip" onclick="setFilter('Heat Transfer', this)">🔥 Heat Transfer</div>
+      <div class="filter-chip" onclick="setFilter('Control Systems', this)">🎛️ Control Systems</div>
+      <div class="filter-chip" onclick="setFilter('Man Tech', this)">⚙️ Man Tech</div>
+      <div class="filter-chip" onclick="setFilter('FOTE', this)">🔥 FOTE</div>
+      <div class="filter-chip" onclick="setFilter('Machine Design', this)">📐 Machine Design</div>
+    </div>
+
+    <!-- Date Navigation Bar -->
     <div class="date-bar" id="dateBar"></div>
 
-    <!-- Timeline of Blocks -->
+    <!-- Timeline of Sessions -->
     <div class="timeline" id="timelineList"></div>
   </main>
 
-  <!-- Embedded V2 Schedule Data (100% Offline & Standalone) -->
+  <!-- Edit / Add Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Edit Study Session</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editId">
+        
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select id="editSubject" class="form-select">
+            <option value="Heat Transfer">Heat Transfer</option>
+            <option value="Control Systems">Control Systems</option>
+            <option value="Man Tech">Man Tech</option>
+            <option value="FOTE">FOTE</option>
+            <option value="Machine Design">Machine Design</option>
+            <option value="Projects Review">Projects Review</option>
+            <option value="Routine">Routine / Break</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date (YYYY-MM-DD)</label>
+          <input type="date" id="editDate" class="form-input">
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Start Time</label>
+            <input type="time" id="editStart" class="form-input">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">End Time</label>
+            <input type="time" id="editEnd" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Topic / Title</label>
+          <input type="text" id="editTopic" class="form-input" placeholder="e.g. Conduction & Fins">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Action / Objectives</label>
+          <textarea id="editDesc" class="form-textarea" placeholder="Specific derivations, numerical problems..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Files in D:\Sem 5 (Comma separated or one per line)</label>
+          <textarea id="editFiles" class="form-textarea" placeholder="Heat Transfer/Notes/Lec01.pdf, Tut-1.pdf"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select id="editPriority" class="form-select">
+            <option value="CRITICAL">CRITICAL</option>
+            <option value="HIGH">HIGH</option>
+            <option value="NORMAL">NORMAL</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" onclick="saveModal()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const fullSchedule = [
+    // Initial Default Schedule
+    const DEFAULT_SCHEDULE = [
   {
     "id": "blk_v2_001",
     "date": "2026-11-05",
@@ -2497,74 +2744,396 @@
   }
 ];
 
-    let selectedDate = "2026-11-05";
-    let selectedSubject = "ALL";
-    let alertsEnabled = false;
-    let audioCtx = null;
-    let lastAlertedId = null;
-
-    // Chime Sound
-    function playChime() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, now);
-        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.6);
-      } catch (e) {}
+    // Load from localStorage if user made edits, otherwise use default
+    function getSchedule() {
+      const custom = localStorage.getItem('apex_custom_schedule_v2');
+      if (custom) {
+        try {
+          const parsed = JSON.parse(custom);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch(e) {}
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
     }
 
-    function toggleAlerts() {
-      if (!("Notification" in window)) {
-        alert("Desktop/browser notifications are not supported on this browser.");
+    let fullSchedule = getSchedule();
+    let isEditMode = false;
+    let selectedFilter = "ALL";
+
+    // Detect today's reference date dynamically
+    const realNow = new Date();
+    const yStr = realNow.getFullYear();
+    const mStr = String(realNow.getMonth() + 1).padStart(2, '0');
+    const dStr = String(realNow.getDate()).padStart(2, '0');
+    const systemToday = `${yStr}-${mStr}-${dStr}`;
+
+    // Default to systemToday if within schedule dates, else first schedule date (2026-11-05)
+    const scheduleDates = [...new Set(fullSchedule.map(s => s.date))].sort();
+    let selectedDate = scheduleDates.includes(systemToday) ? systemToday : (scheduleDates[0] || "2026-11-05");
+
+    function parseMin(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    // Real-time HUD Updater (Handles midnight crossing properly!)
+    function updateHeroHUD() {
+      const now = new Date();
+      const curHours = now.getHours();
+      const curMins = now.getMinutes();
+      const curSecs = now.getSeconds();
+      const curTotalMin = curHours * 60 + curMins;
+
+      // Update header clock
+      const timeClockStr = String(curHours).padStart(2, '0') + ":" + String(curMins).padStart(2, '0') + ":" + String(curSecs).padStart(2, '0');
+      document.getElementById('clockDisplay').innerText = timeClockStr;
+
+      // Match against today's blocks
+      // If system date is within schedule, use systemToday, else fallback to selectedDate
+      const activeDate = scheduleDates.includes(systemToday) ? systemToday : selectedDate;
+      const todayBlocks = fullSchedule.filter(b => b.date === activeDate);
+
+      let current = null;
+      let next = null;
+
+      for (let i = 0; i < todayBlocks.length; i++) {
+        const b = todayBlocks[i];
+        const startMin = parseMin(b.start);
+        let endMin = parseMin(b.end);
+
+        if (endMin <= startMin) {
+          // Spans across midnight (e.g. 21:45 to 00:30)
+          endMin += 24 * 60;
+        }
+
+        let compMin = curTotalMin;
+        if (curTotalMin < parseMin(todayBlocks[0].start) && endMin > 24 * 60) {
+          // After midnight check
+          compMin += 24 * 60;
+        }
+
+        if (compMin >= startMin && compMin < endMin) {
+          current = b;
+          next = todayBlocks[i + 1] || null;
+          break;
+        } else if (compMin < startMin && !current) {
+          current = b; // Upcoming next
+          next = todayBlocks[i + 1] || null;
+          break;
+        }
+      }
+
+      // If still none, find the next earliest block
+      if (!current) {
+        current = fullSchedule.find(b => b.date >= activeDate && b.type !== 'SLEEP') || fullSchedule[0];
+      }
+
+      if (current) {
+        const startMin = parseMin(current.start);
+        let endMin = parseMin(current.end);
+        if (endMin <= startMin) endMin += 24 * 60;
+
+        let compMin = curTotalMin;
+        if (curTotalMin < parseMin(todayBlocks[0]?.start || "00:00") && endMin > 24 * 60) {
+          compMin += 24 * 60;
+        }
+
+        const isCurrentlyActive = (compMin >= startMin && compMin < endMin);
+
+        document.getElementById('heroStatusText').innerText = isCurrentlyActive 
+          ? "ACTIVE STUDY BLOCK" 
+          : `UPCOMING: ${current.date} @ ${current.start}`;
+
+        // Calculate countdown timer
+        if (isCurrentlyActive) {
+          const totalRemainingSec = (endMin * 60) - (curTotalMin * 60 + curSecs);
+          if (totalRemainingSec > 0) {
+            const rh = Math.floor(totalRemainingSec / 3600);
+            const rm = Math.floor((totalRemainingSec % 3600) / 60);
+            const rs = totalRemainingSec % 60;
+            document.getElementById('heroCountdownTimer').innerText = 
+              `${String(rh).padStart(2, '0')}h ${String(rm).padStart(2, '0')}m ${String(rs).padStart(2, '0')}s left`;
+          } else {
+            document.getElementById('heroCountdownTimer').innerText = "Ending now";
+          }
+        } else {
+          document.getElementById('heroCountdownTimer').innerText = `${current.start} - ${current.end}`;
+        }
+
+        // Set subject pill
+        const sTag = document.getElementById('heroSubjectBadge');
+        sTag.innerText = current.subject;
+        const cleanSub = current.subject.replace(/\s+/g, '');
+        sTag.className = `hero-subject-pill sub-${cleanSub}`;
+
+        document.getElementById('heroTopic').innerText = current.topic;
+        document.getElementById('heroDesc').innerText = current.description;
+
+        const filesBox = document.getElementById('heroFilesBox');
+        const filesList = document.getElementById('heroFilesList');
+        filesList.innerHTML = '';
+        if (current.files && current.files.length > 0) {
+          filesBox.style.display = 'block';
+          current.files.forEach(f => {
+            const pill = document.createElement('div');
+            pill.className = 'file-chip';
+            pill.innerText = '📄 ' + f;
+            filesList.appendChild(pill);
+          });
+        } else {
+          filesBox.style.display = 'none';
+        }
+
+        if (next) {
+          document.getElementById('heroNextText').innerText = `[${next.subject}] ${next.topic} (${next.start})`;
+        } else {
+          document.getElementById('heroNextText').innerText = "Semester wrap-up!";
+        }
+      }
+    }
+
+    // Date Tabs Bar
+    function initDateTabs() {
+      const dates = [...new Set(fullSchedule.map(s => s.date))].sort();
+      const container = document.getElementById('dateBar');
+      container.innerHTML = '';
+
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+      dates.forEach(d => {
+        const pill = document.createElement('div');
+        pill.className = `date-pill ${d === selectedDate ? 'active' : ''}`;
+        
+        const parts = d.split('-');
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const dayNum = parseInt(parts[2], 10);
+        const dObj = new Date(y, m, dayNum);
+        const dayName = days[dObj.getDay()] || '';
+        const monthDay = (months[m] || '') + ' ' + dayNum;
+
+        pill.innerHTML = `<div>${dayName}</div><div style="font-size:0.85rem">${monthDay}</div>`;
+        pill.onclick = () => {
+          selectedDate = d;
+          document.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          renderTimeline();
+          updateHeroHUD();
+        };
+        container.appendChild(pill);
+      });
+    }
+
+    function setFilter(subj, el) {
+      selectedFilter = subj;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderTimeline();
+    }
+
+    // Render Timeline Cards
+    function renderTimeline() {
+      const container = document.getElementById('timelineList');
+      container.innerHTML = '';
+
+      let list = fullSchedule.filter(b => b.date === selectedDate);
+      if (selectedFilter !== 'ALL') {
+        list = list.filter(b => b.subject.toLowerCase().includes(selectedFilter.toLowerCase()) || b.type === 'EXAM');
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = '<div style="color:#64748b; text-align:center; padding:30px;">No sessions scheduled for this filter. Tap "➕ Add Session" to create one.</div>';
         return;
       }
-      if (Notification.permission === "granted") {
-        alertsEnabled = !alertsEnabled;
-        updateAlertUI();
-        if (alertsEnabled) {
-          playChime();
-          new Notification("🔔 Apex Study Alerts ACTIVE", {
-            body: "Study alerts configured for Sem 5."
-          });
+
+      const savedDone = JSON.parse(localStorage.getItem('apex_done_v2') || '{}');
+
+      list.forEach(b => {
+        const card = document.createElement('div');
+        const isDone = !!savedDone[b.id];
+        card.className = `block-card ${isDone ? 'done' : ''} ${isEditMode ? 'is-editing' : ''}`;
+
+        let badgeClass = 'sub-Routine';
+        if (b.type === 'EXAM') badgeClass = 'sub-Exam';
+        else if (b.type === 'SUBMISSION') badgeClass = 'sub-Submit';
+        else if (b.type === 'CLASS') badgeClass = 'sub-Class';
+        else {
+          const cleanSub = b.subject.replace(/\s+/g, '');
+          badgeClass = `sub-${cleanSub}`;
         }
-      } else {
-        Notification.requestPermission().then(p => {
-          if (p === "granted") {
-            alertsEnabled = true;
-            updateAlertUI();
-            playChime();
-          }
-        });
-      }
+
+        const filesHtml = (b.files && b.files.length > 0)
+          ? `<div class="block-files-list">📂 ${b.files.map(f => f.split('/').pop()).join(', ')}</div>`
+          : '';
+
+        card.innerHTML = `
+          <div class="block-time">
+            <div>${b.start}</div>
+            <div style="font-size:0.65rem; color:#64748b;">${b.end}</div>
+          </div>
+          <div class="block-main">
+            <div class="block-top">
+              <span class="subject-badge ${badgeClass}">${b.subject}</span>
+              <span style="font-size:0.65rem; color:#94a3b8; font-weight:700;">${b.priority || 'NORMAL'}</span>
+            </div>
+            <div class="block-title">${b.topic}</div>
+            <div class="block-desc">${b.description || ''}</div>
+            ${filesHtml}
+          </div>
+          <div class="block-actions-right">
+            <input type="checkbox" class="chk" ${isDone ? 'checked' : ''} onchange="toggleDone('${b.id}', this.checked)">
+            <button class="btn-card-edit" onclick="openEditModal('${b.id}')">✏️</button>
+            <button class="btn-card-del" onclick="deleteSession('${b.id}')">🗑️</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
     }
 
-    function updateAlertUI() {
-      const btn = document.getElementById('btnNotif');
-      if (alertsEnabled) {
+    function toggleDone(id, done) {
+      const saved = JSON.parse(localStorage.getItem('apex_done_v2') || '{}');
+      saved[id] = done;
+      localStorage.setItem('apex_done_v2', JSON.stringify(saved));
+      renderTimeline();
+    }
+
+    // EDIT MODE LOGIC
+    function toggleEditMode() {
+      isEditMode = !isEditMode;
+      const btn = document.getElementById('btnEditToggle');
+      const bar = document.getElementById('editToolbar');
+      if (isEditMode) {
         btn.classList.add('active');
-        btn.innerHTML = '🔔 Alerts ON';
+        btn.innerHTML = '✓ Editing ON';
+        bar.classList.add('active');
       } else {
         btn.classList.remove('active');
-        btn.innerHTML = '🔔 Alerts';
+        btn.innerHTML = '✏️ Edit Mode';
+        bar.classList.remove('active');
+      }
+      renderTimeline();
+    }
+
+    function openEditModal(id) {
+      const b = fullSchedule.find(x => x.id === id);
+      if (!b) return;
+
+      document.getElementById('modalTitle').innerText = "Edit Study Session";
+      document.getElementById('editId').value = b.id;
+      document.getElementById('editSubject').value = b.subject;
+      document.getElementById('editDate').value = b.date;
+      document.getElementById('editStart').value = b.start;
+      document.getElementById('editEnd').value = b.end;
+      document.getElementById('editTopic').value = b.topic;
+      document.getElementById('editDesc').value = b.description || '';
+      document.getElementById('editFiles').value = (b.files || []).join(', ');
+      document.getElementById('editPriority').value = b.priority || 'NORMAL';
+
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openAddModal() {
+      document.getElementById('modalTitle').innerText = "Add New Study Session";
+      document.getElementById('editId').value = "";
+      document.getElementById('editSubject').value = "Heat Transfer";
+      document.getElementById('editDate').value = selectedDate;
+      document.getElementById('editStart').value = "18:00";
+      document.getElementById('editEnd').value = "20:00";
+      document.getElementById('editTopic').value = "";
+      document.getElementById('editDesc').value = "";
+      document.getElementById('editFiles').value = "";
+      document.getElementById('editPriority').value = "HIGH";
+
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('open');
+    }
+
+    function saveModal() {
+      const id = document.getElementById('editId').value;
+      const subject = document.getElementById('editSubject').value;
+      const date = document.getElementById('editDate').value;
+      const start = document.getElementById('editStart').value;
+      const end = document.getElementById('editEnd').value;
+      const topic = document.getElementById('editTopic').value.trim() || "Untitled Study Session";
+      const desc = document.getElementById('editDesc').value.trim();
+      const filesRaw = document.getElementById('editFiles').value.trim();
+      const priority = document.getElementById('editPriority').value;
+
+      const files = filesRaw ? filesRaw.split(/[,\n]/).map(s => s.trim()).filter(Boolean) : [];
+
+      if (!date || !start || !end) {
+        alert("Please provide Date, Start Time, and End Time.");
+        return;
+      }
+
+      if (id) {
+        // Edit existing
+        const b = fullSchedule.find(x => x.id === id);
+        if (b) {
+          b.subject = subject;
+          b.date = date;
+          b.start = start;
+          b.end = end;
+          b.topic = topic;
+          b.description = desc;
+          b.files = files;
+          b.priority = priority;
+        }
+      } else {
+        // Add new
+        const newBlock = {
+          id: "custom_" + Date.now(),
+          date: date,
+          start: start,
+          end: end,
+          type: "STUDY",
+          subject: subject,
+          topic: topic,
+          files: files,
+          description: desc,
+          priority: priority
+        };
+        fullSchedule.push(newBlock);
+        fullSchedule.sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
+      }
+
+      // Persist edits to localStorage
+      localStorage.setItem('apex_custom_schedule_v2', JSON.stringify(fullSchedule));
+      closeModal();
+      initDateTabs();
+      renderTimeline();
+      updateHeroHUD();
+    }
+
+    function deleteSession(id) {
+      if (confirm("Delete this session from your schedule?")) {
+        fullSchedule = fullSchedule.filter(x => x.id !== id);
+        localStorage.setItem('apex_custom_schedule_v2', JSON.stringify(fullSchedule));
+        renderTimeline();
+        updateHeroHUD();
       }
     }
 
-    // Download RFC-compliant ICS directly from browser memory
+    function resetSchedule() {
+      if (confirm("Reset schedule back to default plan? Any custom changes will be discarded.")) {
+        localStorage.removeItem('apex_custom_schedule_v2');
+        fullSchedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+        initDateTabs();
+        renderTimeline();
+        updateHeroHUD();
+      }
+    }
+
+    // Download custom edited ICS
     function downloadICS() {
       let ics = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//Apex Study//Sem 5 V2//EN",
+        "PRODID:-//Apex Study//Custom Sem 5//EN",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
         "X-WR-CALNAME:Sem 5 Endsem Strategic Plan",
@@ -2630,186 +3199,11 @@
       document.body.removeChild(a);
     }
 
-    // Date navigation
-    function initDateBar() {
-      const dates = [...new Set(fullSchedule.map(s => s.date))].sort();
-      const container = document.getElementById('dateBar');
-      container.innerHTML = '';
-
-      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
-      dates.forEach(d => {
-        const pill = document.createElement('div');
-        pill.className = `date-pill ${d === selectedDate ? 'active' : ''}`;
-        
-        const parts = d.split('-');
-        const y = parseInt(parts[0], 10);
-        const m = parseInt(parts[1], 10) - 1;
-        const dayNum = parseInt(parts[2], 10);
-        const dObj = new Date(y, m, dayNum);
-        const dayName = days[dObj.getDay()] || '';
-        const monthDay = (months[m] || '') + ' ' + dayNum;
-
-        pill.innerHTML = `<div>${dayName}</div><div style="font-size:0.85rem">${monthDay}</div>`;
-        pill.onclick = () => {
-          selectedDate = d;
-          document.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
-          pill.classList.add('active');
-          renderTimeline();
-        };
-        container.appendChild(pill);
-      });
-    }
-
-    function setSubjectFilter(subj, el) {
-      selectedSubject = subj;
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      renderTimeline();
-    }
-
-    function updateHero() {
-      const now = new Date();
-      const todayStr = "2026-11-05"; // Ground zero reference
-      const timeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
-
-      let current = null;
-      let next = null;
-
-      for (let i = 0; i < fullSchedule.length; i++) {
-        const b = fullSchedule[i];
-        if (b.date === todayStr) {
-          if (timeStr >= b.start && timeStr < b.end) {
-            current = b;
-            next = fullSchedule[i + 1] || null;
-            break;
-          } else if (timeStr < b.start) {
-            current = b;
-            next = fullSchedule[i + 1] || null;
-            break;
-          }
-        }
-      }
-
-      if (!current) {
-        current = fullSchedule.find(b => b.date >= todayStr && b.type !== 'SLEEP') || fullSchedule[0];
-      }
-
-      if (current) {
-        const isNow = (timeStr >= current.start && timeStr < current.end && current.date === todayStr);
-        document.getElementById('heroStatus').innerText = isNow ? "ACTIVE STUDY BLOCK" : `UPCOMING: ${current.date} @ ${current.start}`;
-        document.getElementById('heroTimer').innerText = `${current.start} - ${current.end}`;
-
-        const sTag = document.getElementById('heroSubjectTag');
-        sTag.innerText = current.subject;
-        const cleanSub = current.subject.replace(/\s+/g, '');
-        sTag.className = `hud-subject-tag sub-${cleanSub}`;
-
-        document.getElementById('heroTopic').innerText = current.topic;
-        document.getElementById('heroDesc').innerText = current.description;
-
-        const filesBox = document.getElementById('heroFilesBox');
-        const filesList = document.getElementById('heroFilesList');
-        filesList.innerHTML = '';
-        if (current.files && current.files.length > 0) {
-          filesBox.style.display = 'block';
-          current.files.forEach(f => {
-            const pill = document.createElement('div');
-            pill.className = 'file-pill';
-            pill.innerText = '📄 ' + f;
-            filesList.appendChild(pill);
-          });
-        } else {
-          filesBox.style.display = 'none';
-        }
-
-        if (next) {
-          document.getElementById('heroNext').innerText = `[${next.subject}] ${next.topic} (${next.start})`;
-        } else {
-          document.getElementById('heroNext').innerText = "Semester finished!";
-        }
-
-        if (alertsEnabled && current.id !== lastAlertedId && timeStr >= current.start) {
-          lastAlertedId = current.id;
-          playChime();
-          if (Notification.permission === "granted") {
-            new Notification(`⏰ [${current.subject}] ${current.topic}`, {
-              body: current.files && current.files.length > 0 ? `Files: ${current.files.join(', ')}` : current.description
-            });
-          }
-        }
-      }
-    }
-
-    function renderTimeline() {
-      const container = document.getElementById('timelineList');
-      container.innerHTML = '';
-
-      let list = fullSchedule.filter(b => b.date === selectedDate);
-      if (selectedSubject !== 'ALL') {
-        list = list.filter(b => b.subject.toLowerCase().includes(selectedSubject.toLowerCase()) || b.type === 'EXAM');
-      }
-
-      if (list.length === 0) {
-        container.innerHTML = '<div style="color:#64748b; text-align:center; padding:30px;">No sessions scheduled for this filter.</div>';
-        return;
-      }
-
-      const savedDone = JSON.parse(localStorage.getItem('apex_done_v2') || '{}');
-
-      list.forEach(b => {
-        const card = document.createElement('div');
-        const isDone = !!savedDone[b.id];
-        card.className = `block-card ${isDone ? 'done' : ''}`;
-
-        let badgeClass = 'sub-Routine';
-        if (b.type === 'EXAM') badgeClass = 'sub-Exam';
-        else if (b.type === 'SUBMISSION') badgeClass = 'sub-Submit';
-        else if (b.type === 'CLASS') badgeClass = 'sub-Class';
-        else {
-          const cleanSub = b.subject.replace(/\s+/g, '');
-          badgeClass = `sub-${cleanSub}`;
-        }
-
-        const filesHtml = (b.files && b.files.length > 0)
-          ? `<div class="block-files-list">📂 ${b.files.map(f => f.split('/').pop()).join(', ')}</div>`
-          : '';
-
-        card.innerHTML = `
-          <div class="block-time">
-            <div>${b.start}</div>
-            <div style="font-size:0.65rem; color:#64748b;">${b.end}</div>
-          </div>
-          <div class="block-main">
-            <div class="block-top">
-              <span class="subject-badge ${badgeClass}">${b.subject}</span>
-              <span style="font-size:0.65rem; color:#94a3b8; font-weight:700;">${b.priority}</span>
-            </div>
-            <div class="block-title">${b.topic}</div>
-            <div class="block-desc">${b.description}</div>
-            ${filesHtml}
-          </div>
-          <div class="block-check">
-            <input type="checkbox" class="chk" ${isDone ? 'checked' : ''} onchange="toggleDone('${b.id}', this.checked)">
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function toggleDone(id, done) {
-      const saved = JSON.parse(localStorage.getItem('apex_done_v2') || '{}');
-      saved[id] = done;
-      localStorage.setItem('apex_done_v2', JSON.stringify(saved));
-      renderTimeline();
-    }
-
     // Boot
-    initDateBar();
-    updateHero();
+    initDateTabs();
+    updateHeroHUD();
     renderTimeline();
-    setInterval(updateHero, 30000);
+    setInterval(updateHeroHUD, 1000); // Ticks every second
   </script>
 </body>
 </html>
